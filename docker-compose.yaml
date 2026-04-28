@@ -16,10 +16,12 @@ services:
       - temporal-network
     labels:
       # Router for main Postiz entrypoint (on port 5000)
+      - "traefik.enable=true"
+      - "traefik.docker.network=postiz-network"
       - "traefik.http.routers.postiz.rule=Host(`social.wiseadmit.io`)"  # Replace with your domain
-      - "traefik.http.services.postiz.loadbalancer.server.port=5000"  # Internal port for postiz
       - "traefik.http.routers.postiz.entrypoints=websecure"  # Postiz requires HTTPS
-      - "traefik.http.routers.postiz.tls=true"
+      - "traefik.http.routers.postiz.tls.certresolver=myresolver" # <--- Tell it to use Let's Encrypt
+      - "traefik.http.services.postiz.loadbalancer.server.port=5000"  # Internal port for postiz
     depends_on:
       postiz-postgres:
         condition: service_healthy
@@ -29,16 +31,25 @@ services:
     image: "traefik:v2.9"
     container_name: "traefik"
     command:
-      #- "--log.level=DEBUG"
       - "--api.insecure=true"
       - "--api.dashboard=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
+      # Global HTTP -> HTTPS Redirect
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      # Let's Encrypt Configuration
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=social@social.wiseadmit.io"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     ports:
+      - "80:80"
       - "443:443"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "traefik-certs:/letsencrypt"
     networks:
       - postiz-network
   postiz-postgres:
@@ -179,9 +190,13 @@ volumes:
   postiz-uploads:
     external: false
 
+  traefik-certs:
+    external: false
+
 networks:
   postiz-network:
     external: false
+    name: postiz-network
   temporal-network:
     driver: bridge
     name: temporal-network
