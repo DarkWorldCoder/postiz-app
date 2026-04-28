@@ -28,7 +28,7 @@ services:
       postiz-redis:
         condition: service_healthy
   traefik:
-    image: "traefik:v2.9"
+    image: "traefik:v2.11"
     container_name: "traefik"
     command:
       - "--api.insecure=true"
