@@ -3,6 +3,7 @@
 # This is only for the dev enviroment
 
 services:
+
   postiz-postgres:
     # ref: https://hub.docker.com/_/postgres
     image: postgres:17-alpine # 17.0
@@ -16,7 +17,7 @@ services:
     volumes:
       - postgres-volume:/var/lib/postgresql/data
     ports:
-      - 5432:5432
+      - 5434:5432
     networks:
       - postiz-network
   postiz-redis:
@@ -25,7 +26,7 @@ services:
     container_name: postiz-redis
     restart: always
     ports:
-      - 6379:6379
+      - 6380:6379
     networks:
       - postiz-network
   postiz-pg-admin:
@@ -133,7 +134,7 @@ services:
     networks:
       - temporal-network
     ports:
-      - "8080:8080"
+      - "8090:8080"
 
 volumes:
   redisinsight:
