@@ -5,10 +5,10 @@ import { withSentryConfig } from '@sentry/nextjs';
 const nextConfig = {
   experimental: {
     proxyTimeout: 90_000,
-    turbo: {
-      resolveAlias: {
-        '@noble/hashes/_assert': './noble-hashes-assert-shim.mjs',
-      },
+  },
+  turbopack: {
+    resolveAlias: {
+      '@noble/hashes/_assert': './noble-hashes-assert-shim.mjs',
     },
   },
   // Document-Policy header for browser profiling
