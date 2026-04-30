@@ -1,6 +1,12 @@
 services:
   postiz:
-    image: ghcr.io/gitroomhq/postiz-app:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        NEXT_PUBLIC_VERSION: ${NEXT_PUBLIC_VERSION:-local}
+    image: wiseadmit-postiz-app:local
+    pull_policy: build
     container_name: postiz
     restart: always
     env_file:
@@ -9,19 +15,29 @@ services:
     volumes:
       - postiz-config:/config/
       - postiz-uploads:/uploads/
-    ports:
-      - "4007:5000"
+    expose:
+      - "3000"
+      - "4200"
     networks:
       - postiz-network
       - temporal-network
     labels:
-      # Router for main Postiz entrypoint (on port 5000)
+      # Frontend router
       - "traefik.enable=true"
       - "traefik.docker.network=postiz-network"
       - "traefik.http.routers.postiz.rule=Host(`social.wiseadmit.io`)"  # Replace with your domain
       - "traefik.http.routers.postiz.entrypoints=websecure"  # Postiz requires HTTPS
       - "traefik.http.routers.postiz.tls.certresolver=myresolver" # <--- Tell it to use Let's Encrypt
-      - "traefik.http.services.postiz.loadbalancer.server.port=5000"  # Internal port for postiz
+      - "traefik.http.routers.postiz.priority=1"
+      - "traefik.http.services.postiz.loadbalancer.server.port=4200"
+      # Backend API router. Mirrors the old nginx /api -> backend:3000 behavior.
+      - "traefik.http.routers.postiz-api.rule=Host(`social.wiseadmit.io`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.postiz-api.entrypoints=websecure"
+      - "traefik.http.routers.postiz-api.tls.certresolver=myresolver"
+      - "traefik.http.routers.postiz-api.priority=100"
+      - "traefik.http.routers.postiz-api.middlewares=postiz-api-strip"
+      - "traefik.http.middlewares.postiz-api-strip.stripprefix.prefixes=/api"
+      - "traefik.http.services.postiz-api.loadbalancer.server.port=3000"
     depends_on:
       postiz-postgres:
         condition: service_healthy
