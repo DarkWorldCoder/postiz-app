@@ -704,7 +704,13 @@ export const AddProviderComponent: FC<{
                         item.identifier !== 'google_my_business' &&
                           'rounded-full'
                       )}
-                      src={`/icons/platforms/${item.identifier}.png`}
+                      src={`/icons/platforms/${
+                        ['facebook-ads', 'facebook-messages'].includes(
+                          item.identifier
+                        )
+                          ? 'facebook'
+                          : item.identifier
+                      }.png`}
                     />
                   )}
                 </div>

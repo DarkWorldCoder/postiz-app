@@ -8,6 +8,7 @@ import ImageWithFallback from '@gitroom/react/helpers/image.with.fallback';
 import SafeImage from '@gitroom/react/helpers/safe.image';
 import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
 import { RenderAnalytics } from '@gitroom/frontend/components/platform-analytics/render.analytics';
+import { CrossPlatformAnalytics } from '@gitroom/frontend/components/platform-analytics/cross.platform.analytics';
 import { Select } from '@gitroom/react/form/select';
 import { Button } from '@gitroom/react/form/button';
 import { useRouter } from 'next/navigation';
@@ -19,6 +20,7 @@ import { SVGLine } from '@gitroom/frontend/components/launches/launches.componen
 import { LoadingComponent } from '@gitroom/frontend/components/layout/loading';
 const allowedIntegrations = [
   'facebook',
+  'facebook-ads',
   'instagram',
   'instagram-standalone',
   'linkedin-page',
@@ -78,6 +80,7 @@ export const PlatformAnalytics = () => {
     if (
       [
         'facebook',
+        'facebook-ads',
         'instagram',
         'instagram-standalone',
         'linkedin-page',
@@ -97,6 +100,7 @@ export const PlatformAnalytics = () => {
     if (
       [
         'facebook',
+        'facebook-ads',
         'instagram',
         'instagram-standalone',
         'linkedin-page',
@@ -114,7 +118,15 @@ export const PlatformAnalytics = () => {
       });
     }
     if (
-      ['facebook', 'linkedin-page', 'pinterest', 'youtube', 'x', 'gmb'].indexOf(
+      [
+        'facebook',
+        'facebook-ads',
+        'linkedin-page',
+        'pinterest',
+        'youtube',
+        'x',
+        'gmb',
+      ].indexOf(
         currentIntegration.identifier
       ) !== -1
     ) {
@@ -204,6 +216,23 @@ export const PlatformAnalytics = () => {
               </svg>
             </div>
           </div>
+          
+          <div
+            onClick={() => setCurrent(-1)}
+            className={clsx(
+              'flex gap-[12px] p-[8px] items-center group/profile justify-center hover:bg-boxHover rounded-e-[8px]',
+              current !== -1 && 'opacity-20 hover:opacity-100 cursor-pointer'
+            )}
+          >
+            <div className="relative rounded-full flex justify-center items-center gap-[6px]">
+              <div className="h-[36px] w-[36px] rounded-[8px] bg-newBgLineColor flex items-center justify-center text-[18px]">
+                🌐
+              </div>
+            </div>
+            <div className="flex-1 whitespace-nowrap font-[500] text-ellipsis overflow-hidden group-[.sidebar]:hidden">
+              {t('all_platforms', 'All Platforms')}
+            </div>
+          </div>
           {sortedIntegrations.map((integration, index) => (
             <div
               key={integration.id}
@@ -245,7 +274,13 @@ export const PlatformAnalytics = () => {
                   <SVGLine />
                 </div>
                 <ImageWithFallback
-                  fallbackSrc={`/icons/platforms/${integration.identifier}.png`}
+                  fallbackSrc={`/icons/platforms/${
+                    ['facebook-ads', 'facebook-messages'].includes(
+                      integration.identifier
+                    )
+                      ? 'facebook'
+                      : integration.identifier
+                  }.png`}
                   src={integration.picture}
                   className="rounded-[8px]"
                   alt={integration.identifier}
@@ -253,7 +288,13 @@ export const PlatformAnalytics = () => {
                   height={36}
                 />
                 <SafeImage
-                  src={`/icons/platforms/${integration.identifier}.png`}
+                  src={`/icons/platforms/${
+                    ['facebook-ads', 'facebook-messages'].includes(
+                      integration.identifier
+                    )
+                      ? 'facebook'
+                      : integration.identifier
+                  }.png`}
                   className="rounded-[8px] absolute z-10 bottom-[5px] -end-[5px] border border-fifth"
                   alt={integration.identifier}
                   width={18.41}
@@ -273,7 +314,7 @@ export const PlatformAnalytics = () => {
         </div>
       </div>
       <div className="bg-newBgColorInner flex-1 flex-col flex p-[20px] gap-[12px]">
-        {!!options.length && (
+        {!!options.length && current !== -1 && (
           <div className="flex-1 flex flex-col gap-[14px]">
             <div className="max-w-[200px]">
               <Select
@@ -294,6 +335,33 @@ export const PlatformAnalytics = () => {
               {!!keys && !!currentIntegration && !refresh && (
                 <RenderAnalytics integration={currentIntegration} date={keys} />
               )}
+            </div>
+          </div>
+        )}
+        
+        {current === -1 && (
+          <div className="flex-1 flex flex-col gap-[14px]">
+            <div className="max-w-[200px]">
+              <Select
+                label=""
+                name="date"
+                disableForm={true}
+                hideErrors={true}
+                onChange={(e) => setKey(+e.target.value)}
+              >
+                {[
+                  { key: 7, value: t('7_days', '7 Days') },
+                  { key: 30, value: t('30_days', '30 Days') },
+                  { key: 90, value: t('90_days', '90 Days') },
+                ].map((option) => (
+                  <option key={option.key} value={option.key}>
+                    {option.value}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <div className="flex-1">
+              <CrossPlatformAnalytics date={keys} />
             </div>
           </div>
         )}

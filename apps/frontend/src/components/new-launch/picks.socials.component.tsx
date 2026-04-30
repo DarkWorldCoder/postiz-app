@@ -88,7 +88,17 @@ export const PicksSocialsComponent: FC<{ toolTip?: boolean }> = ({
                       />
                     ) : (
                       <SafeImage
-                        src={`/icons/platforms/${integration.identifier}.png`}
+                        src={`/icons/platforms/${
+                          ['facebook-ads', 'facebook-messages'].includes(
+                            integration.identifier
+                          )
+                            ? 'facebook'
+                            : integration.identifier === 'tiktok-business'
+                            ? 'tiktok'
+                            : integration.identifier === 'instagram-messages'
+                            ? 'instagram'
+                            : integration.identifier
+                        }.png`}
                         className="rounded-[4px] absolute z-10 bottom-0 -end-[5px] min-w-[16px] min-h-[16px]"
                         alt={integration.identifier}
                         width={16}

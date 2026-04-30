@@ -17,6 +17,173 @@ interface MenuItemInterface {
   onClick?: () => void;
 }
 
+const CommentsIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="21"
+    height="21"
+    viewBox="0 0 24 24"
+    fill="none"
+  >
+    <path
+      d="M7.5 19.25C8.7943 19.8751 10.3195 20.25 12 20.25C17.1086 20.25 21.25 16.7792 21.25 12.5C21.25 8.22079 17.1086 4.75 12 4.75C6.89137 4.75 2.75 8.22079 2.75 12.5C2.75 14.3553 3.52849 16.0583 4.82654 17.3921L4 21L7.5 19.25Z"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M8.25 11.75H15.75M8.25 14.5H13"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
+const AdsIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="21"
+    height="21"
+    viewBox="0 0 24 24"
+    fill="none"
+  >
+    <path
+      d="M7.5 10.75H4.75C3.64543 10.75 2.75 11.6454 2.75 12.75C2.75 13.8546 3.64543 14.75 4.75 14.75H7.5L17.75 18.25V7.25L7.5 10.75Z"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M7.75 13.5L9.25 19.25H11.75L10.25 14.25M20.25 9.25V14.75"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const LeadsIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="21"
+    height="21"
+    viewBox="0 0 24 24"
+    fill="none"
+  >
+    <path
+      d="M10.5 12.25C12.5711 12.25 14.25 10.5711 14.25 8.5C14.25 6.42893 12.5711 4.75 10.5 4.75C8.42893 4.75 6.75 6.42893 6.75 8.5C6.75 10.5711 8.42893 12.25 10.5 12.25Z"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M4.75 19.25C5.44918 16.7498 7.74659 14.75 10.5 14.75C11.6724 14.75 12.7537 15.1136 13.6429 15.7318M17.75 13.75V20.25M14.5 17H21"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const CommerceIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="21"
+    height="21"
+    viewBox="0 0 24 24"
+    fill="none"
+  >
+    <path
+      d="M6.75 8.75H17.25L18.25 20.25H5.75L6.75 8.75Z"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M9 10.75V7.75C9 5.95507 10.4551 4.5 12.25 4.5C14.0449 4.5 15.5 5.95507 15.5 7.75V10.75"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const AudiencesIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="21"
+    height="21"
+    viewBox="0 0 24 24"
+    fill="none"
+  >
+    <path
+      d="M9.25 11.75C11.183 11.75 12.75 10.183 12.75 8.25C12.75 6.317 11.183 4.75 9.25 4.75C7.317 4.75 5.75 6.317 5.75 8.25C5.75 10.183 7.317 11.75 9.25 11.75Z"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M3.75 19.25C4.35479 16.6986 6.59274 14.75 9.25 14.75C10.3628 14.75 11.4021 15.0925 12.2756 15.6837M16.25 11.25C17.7688 11.25 19 10.0188 19 8.5C19 6.98122 17.7688 5.75 16.25 5.75M15.5 14.75C17.5975 15.0458 19.2794 16.565 19.75 18.5"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const IdeasIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="21"
+    height="21"
+    viewBox="0 0 24 24"
+    fill="none"
+  >
+    <path
+      d="M8.75 18.25H15.25M9.25 21.25H14.75M15.75 15.25C15.75 13.1506 18.25 12.1381 18.25 8.75C18.25 5.29822 15.4518 2.75 12 2.75C8.54822 2.75 5.75 5.29822 5.75 8.75C5.75 12.1381 8.25 13.1506 8.25 15.25H15.75Z"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const SubscriptionsIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="21"
+    height="21"
+    viewBox="0 0 24 24"
+    fill="none"
+  >
+    <path
+      d="M7.75 10.25H5.75C4.64543 10.25 3.75 11.1454 3.75 12.25V18.25C3.75 19.3546 4.64543 20.25 5.75 20.25H18.25C19.3546 20.25 20.25 19.3546 20.25 18.25V12.25C20.25 11.1454 19.3546 10.25 18.25 10.25H16.25"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M12 3.75V14.25M12 14.25L8.75 11M12 14.25L15.25 11"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 export const useMenuItem = () => {
   const { isGeneral } = useVariables();
   const t = useT();
@@ -94,6 +261,66 @@ export const useMenuItem = () => {
         </svg>
       ),
       path: '/analytics',
+    },
+    {
+      name: t('inbox', 'Inbox'),
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 20 20"
+          fill="none"
+        >
+          <path
+            d="M2.5 6.5C2.5 5.09987 2.5 4.3998 2.77248 3.86502C3.01217 3.39462 3.39462 3.01217 3.86502 2.77248C4.3998 2.5 5.09987 2.5 6.5 2.5H13.5C14.9001 2.5 15.6002 2.5 16.135 2.77248C16.6054 3.01217 16.9878 3.39462 17.2275 3.86502C17.5 4.3998 17.5 5.09987 17.5 6.5V13.5C17.5 14.9001 17.5 15.6002 17.2275 16.135C16.9878 16.6054 16.6054 16.9878 16.135 17.2275C15.6002 17.5 14.9001 17.5 13.5 17.5H6.5C5.09987 17.5 4.3998 17.5 3.86502 17.2275C3.39462 16.9878 3.01217 16.6054 2.77248 16.135C2.5 15.6002 2.5 14.9001 2.5 13.5V6.5Z"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          />
+          <path
+            d="M2.5 12.5H5.68182C5.98373 12.5 6.13469 12.5 6.27107 12.5471C6.39186 12.5888 6.50061 12.6599 6.58738 12.7548C6.68539 12.862 6.7529 12.997 6.88792 13.2671L7.02927 13.5498C7.16429 13.8199 7.2318 13.9549 7.3298 14.0621C7.41658 14.157 7.52532 14.2281 7.64612 14.2698C7.7825 14.3169 7.93345 14.3169 8.23536 14.3169H11.7646C12.0665 14.3169 12.2175 14.3169 12.3539 14.2698C12.4747 14.2281 12.5834 14.157 12.6702 14.0621C12.7682 13.9549 12.8357 13.8199 12.9707 13.5498L13.1121 13.2671C13.2471 12.997 13.3146 12.862 13.4126 12.7548C13.4994 12.6599 13.6081 12.5888 13.7289 12.5471C13.8653 12.5 14.0163 12.5 14.3182 12.5H17.5"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
+        </svg>
+      ),
+      path: '/inbox',
+    },
+    {
+      name: t('comments', 'Comments'),
+      icon: <CommentsIcon />,
+      path: '/comments',
+    },
+    {
+      name: t('ads_manager', 'Ads'),
+      icon: <AdsIcon />,
+      path: '/ads',
+    },
+    {
+      name: t('leads', 'Leads'),
+      icon: <LeadsIcon />,
+      path: '/leads',
+    },
+    {
+      name: t('commerce', 'Commerce'),
+      icon: <CommerceIcon />,
+      path: '/commerce',
+    },
+    {
+      name: t('audiences', 'Audiences'),
+      icon: <AudiencesIcon />,
+      path: '/audiences',
+    },
+    {
+      name: t('content_suggestions', 'Ideas'),
+      icon: <IdeasIcon />,
+      path: '/content-suggestions',
+    },
+    {
+      name: t('subscriptions', 'Subs'),
+      icon: <SubscriptionsIcon />,
+      path: '/subscriptions',
     },
     {
       name: t('media', 'Media'),
@@ -318,8 +545,8 @@ export const TopMenu: FC = () => {
   const { firstMenu, secondMenu } = useMenuItem();
   const { isGeneral, billingEnabled } = useVariables();
   return (
-    <>
-      <div className="flex flex-1 flex-col minCustom:gap-[16px] blurMe">
+    <div className="flex min-h-0 flex-1 flex-col justify-between gap-[32px] overflow-x-hidden overflow-y-auto pe-[8px] scrollbar-thin scrollbar-thumb-newColColor scrollbar-track-newBgColorInner blurMe">
+      <div className="flex flex-col minCustom:gap-[16px]">
         {
           // @ts-ignore
           user?.orgId &&
@@ -352,7 +579,7 @@ export const TopMenu: FC = () => {
               ))
         }
       </div>
-      <div className="flex flex-col minCustom:gap-[16px] blurMe">
+      <div className="flex flex-col minCustom:gap-[16px]">
         {secondMenu
           .filter((f) => {
             if (f.hide) {
@@ -379,6 +606,6 @@ export const TopMenu: FC = () => {
             />
           ))}
       </div>
-    </>
+    </div>
   );
 };

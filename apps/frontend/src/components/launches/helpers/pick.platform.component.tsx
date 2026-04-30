@@ -259,7 +259,13 @@ export const PickPlatforms: FC<{
                           />
                         ) : (
                           <SafeImage
-                            src={`/icons/platforms/${integration.identifier}.png`}
+                            src={`/icons/platforms/${
+                              ['facebook-ads', 'facebook-messages'].includes(
+                                integration.identifier
+                              )
+                                ? 'facebook'
+                                : integration.identifier
+                            }.png`}
                             className="rounded-full absolute z-10 -bottom-[5px] -end-[5px] border border-fifth"
                             alt={integration.identifier}
                             width={20}

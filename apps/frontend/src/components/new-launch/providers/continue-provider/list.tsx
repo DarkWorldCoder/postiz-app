@@ -2,6 +2,7 @@
 
 import { InstagramContinue } from '@gitroom/frontend/components/new-launch/providers/continue-provider/instagram/instagram.continue';
 import { FacebookContinue } from '@gitroom/frontend/components/new-launch/providers/continue-provider/facebook/facebook.continue';
+import { FacebookAdsContinue } from '@gitroom/frontend/components/new-launch/providers/continue-provider/facebook/facebook-ads.continue';
 import { LinkedinContinue } from '@gitroom/frontend/components/new-launch/providers/continue-provider/linkedin/linkedin.continue';
 import { GmbContinue } from '@gitroom/frontend/components/new-launch/providers/continue-provider/gmb/gmb.continue';
 import { YoutubeContinue } from '@gitroom/frontend/components/new-launch/providers/continue-provider/youtube/youtube.continue';
@@ -9,6 +10,11 @@ import { YoutubeContinue } from '@gitroom/frontend/components/new-launch/provide
 export const continueProviderList = {
   instagram: InstagramContinue,
   facebook: FacebookContinue,
+  'facebook-ads': FacebookAdsContinue,
+  'facebook-messages': FacebookContinue,
+  'instagram-messages': InstagramContinue,
+  'tiktok-business': FacebookAdsContinue,
+  whatsapp: FacebookAdsContinue,
   'linkedin-page': LinkedinContinue,
   gmb: GmbContinue,
   youtube: YoutubeContinue,

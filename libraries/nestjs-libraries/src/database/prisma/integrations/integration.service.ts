@@ -323,6 +323,13 @@ export class IntegrationService {
       profile: getIntegrationInformation.username,
     });
 
+    if (provider.afterConnect) {
+      await provider.afterConnect(
+        getIntegrationInformation.access_token,
+        getIntegrationInformation
+      );
+    }
+
     return { success: true };
   }
 
@@ -402,6 +409,118 @@ export class IntegrationService {
     }
 
     return [];
+  }
+
+  /**
+   * Fetch audience demographics for an integration (Facebook/Instagram)
+   */
+  async checkDemographics(org: Organization, integration: string) {
+    const getIntegration = await this.getIntegrationById(org.id, integration);
+
+    if (!getIntegration || getIntegration.type !== 'social') {
+      return null;
+    }
+
+    const integrationProvider: any =
+      this._integrationManager.getSocialIntegration(
+        getIntegration.providerIdentifier
+      );
+
+    if (!integrationProvider.demographics) {
+      return null;
+    }
+
+    // Check cache
+    const cacheKey = `demographics:${org.id}:${integration}`;
+    const cached = await ioRedis.get(cacheKey);
+    if (cached) {
+      return JSON.parse(cached);
+    }
+
+    try {
+      const demographics = await integrationProvider.demographics(
+        getIntegration.internalId,
+        getIntegration.token
+      );
+
+      await ioRedis.set(
+        cacheKey,
+        JSON.stringify(demographics),
+        'EX',
+        !process.env.NODE_ENV || process.env.NODE_ENV === 'development'
+          ? 60
+          : 3600
+      );
+
+      return demographics;
+    } catch (err) {
+      console.error('Error fetching demographics:', err);
+      return null;
+    }
+  }
+
+  /**
+   * Get cross-platform analytics summary across all integrations
+   */
+  async getCrossPlatformAnalytics(org: Organization, date: string) {
+    const integrations =
+      await this._integrationRepository.getIntegrationsList(org.id);
+
+    const activeIntegrations = integrations.filter(
+      (i) => !i.disabled && !i.deletedAt
+    );
+
+    const results: Array<{
+      integrationId: string;
+      name: string;
+      provider: string;
+      picture: string | null;
+      analytics: AnalyticsData[];
+    }> = [];
+
+    for (const integration of activeIntegrations) {
+      try {
+        const analyticsData = await this.checkAnalytics(
+          org,
+          integration.id,
+          date
+        );
+        results.push({
+          integrationId: integration.id,
+          name: integration.name,
+          provider: integration.providerIdentifier,
+          picture: integration.picture,
+          analytics: analyticsData,
+        });
+      } catch (err) {
+        // Skip integrations that fail
+        continue;
+      }
+    }
+
+    return results;
+  }
+
+  async getContentRanking(org: Organization, integration: string, date = '30') {
+    const getIntegration = await this.getIntegrationById(org.id, integration);
+    if (!getIntegration || getIntegration.type !== 'social') {
+      return [];
+    }
+
+    const integrationProvider: any =
+      this._integrationManager.getSocialIntegration(
+        getIntegration.providerIdentifier
+      );
+
+    if (!integrationProvider.contentRanking) {
+      return [];
+    }
+
+    return integrationProvider.contentRanking(
+      getIntegration.internalId,
+      getIntegration.token,
+      +date
+    );
   }
 
   customers(orgId: string) {

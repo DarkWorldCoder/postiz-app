@@ -9,8 +9,58 @@ import { makeId } from '@gitroom/nestjs-libraries/services/make.is';
 import dayjs from 'dayjs';
 import { SocialAbstract } from '@gitroom/nestjs-libraries/integrations/social.abstract';
 import { FacebookDto } from '@gitroom/nestjs-libraries/dtos/posts/providers-settings/facebook.dto';
-import { DribbbleDto } from '@gitroom/nestjs-libraries/dtos/posts/providers-settings/dribbble.dto';
 import { Integration } from '@prisma/client';
+import { getMetaGraphApiVersion, metaGraphUrl } from '@gitroom/nestjs-libraries/integrations/social/meta/meta-api.constants';
+
+const FACEBOOK_API_VERSION = getMetaGraphApiVersion();
+
+const getFacebookRedirectUri = (
+  identifier: string,
+  refresh?: string
+) =>
+  `${process.env.FRONTEND_URL}/integrations/social/${identifier}${
+    refresh ? `?refresh=${refresh}` : ''
+  }`;
+
+const getPercentageChange = (values: number[]) => {
+  if (values.length < 2) {
+    return 0;
+  }
+
+  const midpoint = Math.ceil(values.length / 2);
+  const previous = values
+    .slice(0, midpoint)
+    .reduce((sum, value) => sum + value, 0);
+  const current = values
+    .slice(midpoint)
+    .reduce((sum, value) => sum + value, 0);
+
+  if (previous === 0) {
+    return current === 0 ? 0 : 100;
+  }
+
+  return Number((((current - previous) / previous) * 100).toFixed(1));
+};
+
+const toMetricValue = (value: unknown) => {
+  if (typeof value === 'number') {
+    return value;
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isNaN(parsed) ? 0 : parsed;
+  }
+
+  if (typeof value === 'object' && value) {
+    return Object.values(value as Record<string, number>).reduce(
+      (sum, item) => sum + Number(item || 0),
+      0
+    );
+  }
+
+  return 0;
+};
 
 export class FacebookProvider extends SocialAbstract implements SocialProvider {
   identifier = 'facebook';
@@ -25,7 +75,7 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
     'read_insights',
   ];
   override maxConcurrentJob = 100; // Facebook has reasonable rate limits
-  editor = 'normal' as const;
+  editor: 'none' | 'normal' | 'markdown' | 'html' = 'normal';
   maxLength() {
     return 63206;
   }
@@ -171,13 +221,34 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
   }
 
   async refreshToken(refresh_token: string): Promise<AuthTokenDetails> {
+    const refreshedToken = await (
+      await fetch(
+        `https://graph.facebook.com/${FACEBOOK_API_VERSION}/oauth/access_token` +
+          '?grant_type=fb_exchange_token' +
+          `&client_id=${process.env.FACEBOOK_APP_ID}` +
+          `&client_secret=${process.env.FACEBOOK_APP_SECRET}` +
+          `&fb_exchange_token=${refresh_token}`
+      )
+    ).json();
+
+    const accessToken = refreshedToken.access_token || refresh_token;
+    const expiresIn =
+      Number(refreshedToken.expires_in) ||
+      dayjs().add(59, 'days').unix() - dayjs().unix();
+
+    const { id, name, picture } = await (
+      await fetch(
+        `https://graph.facebook.com/${FACEBOOK_API_VERSION}/me?fields=id,name,picture&access_token=${accessToken}`
+      )
+    ).json();
+
     return {
-      refreshToken: '',
-      expiresIn: 0,
-      accessToken: '',
-      id: '',
-      name: '',
-      picture: '',
+      refreshToken: accessToken,
+      expiresIn,
+      accessToken,
+      id,
+      name,
+      picture: picture?.data?.url || '',
       username: '',
     };
   }
@@ -186,10 +257,10 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
     const state = makeId(6);
     return {
       url:
-        'https://www.facebook.com/v20.0/dialog/oauth' +
+        `https://www.facebook.com/${FACEBOOK_API_VERSION}/dialog/oauth` +
         `?client_id=${process.env.FACEBOOK_APP_ID}` +
         `&redirect_uri=${encodeURIComponent(
-          `${process.env.FRONTEND_URL}/integrations/social/facebook`
+          getFacebookRedirectUri(this.identifier)
         )}` +
         `&state=${state}` +
         `&scope=${this.scopes.join(',')}`,
@@ -223,12 +294,10 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
   }) {
     const getAccessToken = await (
       await fetch(
-        'https://graph.facebook.com/v20.0/oauth/access_token' +
+        `https://graph.facebook.com/${FACEBOOK_API_VERSION}/oauth/access_token` +
           `?client_id=${process.env.FACEBOOK_APP_ID}` +
           `&redirect_uri=${encodeURIComponent(
-            `${process.env.FRONTEND_URL}/integrations/social/facebook${
-              params.refresh ? `?refresh=${params.refresh}` : ''
-            }`
+            getFacebookRedirectUri(this.identifier, params.refresh)
           )}` +
           `&client_secret=${process.env.FACEBOOK_APP_SECRET}` +
           `&code=${params.code}`
@@ -237,7 +306,7 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
 
     const { access_token } = await (
       await fetch(
-        'https://graph.facebook.com/v20.0/oauth/access_token' +
+        `https://graph.facebook.com/${FACEBOOK_API_VERSION}/oauth/access_token` +
           '?grant_type=fb_exchange_token' +
           `&client_id=${process.env.FACEBOOK_APP_ID}` +
           `&client_secret=${process.env.FACEBOOK_APP_SECRET}` +
@@ -247,7 +316,7 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
 
     const { data } = await (
       await fetch(
-        `https://graph.facebook.com/v20.0/me/permissions?access_token=${access_token}`
+        `https://graph.facebook.com/${FACEBOOK_API_VERSION}/me/permissions?access_token=${access_token}`
       )
     ).json();
 
@@ -258,7 +327,7 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
 
     const { id, name, picture } = await (
       await fetch(
-        `https://graph.facebook.com/v20.0/me?fields=id,name,picture&access_token=${access_token}`
+        `https://graph.facebook.com/${FACEBOOK_API_VERSION}/me?fields=id,name,picture&access_token=${access_token}`
       )
     ).json();
 
@@ -295,7 +364,7 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
 
     // Fetch pages the user explicitly shared during the OAuth dialog
     await fetchPaginated(
-      `https://graph.facebook.com/v20.0/me/accounts?fields=id,username,name,access_token,picture.type(large)&limit=100&access_token=${accessToken}`
+      `https://graph.facebook.com/${FACEBOOK_API_VERSION}/me/accounts?fields=id,username,name,access_token,picture.type(large)&limit=100&access_token=${accessToken}`
     );
 
     // Also fetch pages via Business Manager API to discover pages
@@ -303,7 +372,7 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
     try {
       let bizUrl:
         | string
-        | undefined = `https://graph.facebook.com/v20.0/me/businesses?access_token=${accessToken}`;
+        | undefined = `https://graph.facebook.com/${FACEBOOK_API_VERSION}/me/businesses?access_token=${accessToken}`;
 
       while (bizUrl) {
         const bizResponse = await (await fetch(bizUrl)).json();
@@ -311,7 +380,7 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
           for (const business of bizResponse.data) {
             try {
               await fetchPaginated(
-                `https://graph.facebook.com/v20.0/${business.id}/owned_pages?fields=id,username,name,access_token,picture.type(large)&limit=100&access_token=${accessToken}`
+                `https://graph.facebook.com/${FACEBOOK_API_VERSION}/${business.id}/owned_pages?fields=id,username,name,access_token,picture.type(large)&limit=100&access_token=${accessToken}`
               );
             } catch {
               // Continue with other businesses
@@ -319,7 +388,7 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
 
             try {
               await fetchPaginated(
-                `https://graph.facebook.com/v20.0/${business.id}/client_pages?fields=id,username,name,access_token,picture.type(large)&limit=100&access_token=${accessToken}`
+                `https://graph.facebook.com/${FACEBOOK_API_VERSION}/${business.id}/client_pages?fields=id,username,name,access_token,picture.type(large)&limit=100&access_token=${accessToken}`
               );
             } catch {
               // Continue with other businesses
@@ -364,7 +433,7 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
 
     // 1. Check /me/accounts
     const fromAccounts = await searchPaginated(
-      `https://graph.facebook.com/v20.0/me/accounts?fields=${fields}&limit=100&access_token=${accessToken}`
+      `https://graph.facebook.com/${FACEBOOK_API_VERSION}/me/accounts?fields=${fields}&limit=100&access_token=${accessToken}`
     );
     if (fromAccounts) return fromAccounts;
 
@@ -372,7 +441,7 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
     try {
       let bizUrl:
         | string
-        | undefined = `https://graph.facebook.com/v20.0/me/businesses?access_token=${accessToken}`;
+        | undefined = `https://graph.facebook.com/${FACEBOOK_API_VERSION}/me/businesses?access_token=${accessToken}`;
 
       while (bizUrl) {
         const bizResponse = await (await fetch(bizUrl)).json();
@@ -380,7 +449,7 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
           for (const business of bizResponse.data) {
             try {
               const fromOwned = await searchPaginated(
-                `https://graph.facebook.com/v20.0/${business.id}/owned_pages?fields=${fields}&limit=100&access_token=${accessToken}`
+                `https://graph.facebook.com/${FACEBOOK_API_VERSION}/${business.id}/owned_pages?fields=${fields}&limit=100&access_token=${accessToken}`
               );
               if (fromOwned) return fromOwned;
             } catch {
@@ -389,7 +458,7 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
 
             try {
               const fromClient = await searchPaginated(
-                `https://graph.facebook.com/v20.0/${business.id}/client_pages?fields=${fields}&limit=100&access_token=${accessToken}`
+                `https://graph.facebook.com/${FACEBOOK_API_VERSION}/${business.id}/client_pages?fields=${fields}&limit=100&access_token=${accessToken}`
               );
               if (fromClient) return fromClient;
             } catch {
@@ -422,7 +491,7 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
         ...all
       } = await (
         await this.fetch(
-          `https://graph.facebook.com/v20.0/${id}/videos?access_token=${accessToken}&fields=id,permalink_url`,
+          `https://graph.facebook.com/${FACEBOOK_API_VERSION}/${id}/videos?access_token=${accessToken}&fields=id,permalink_url`,
           {
             method: 'POST',
             headers: {
@@ -431,7 +500,13 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
             body: JSON.stringify({
               file_url: firstPost?.media?.[0]?.path!,
               description: firstPost.message,
-              published: true,
+              published: !firstPost.settings.scheduled_publish_time,
+              ...(firstPost.settings.scheduled_publish_time
+                ? {
+                    scheduled_publish_time:
+                      firstPost.settings.scheduled_publish_time,
+                  }
+                : {}),
             }),
           },
           'upload mp4'
@@ -447,7 +522,7 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
             firstPost.media.map(async (media) => {
               const { id: photoId } = await (
                 await this.fetch(
-                  `https://graph.facebook.com/v20.0/${id}/photos?access_token=${accessToken}`,
+                  `https://graph.facebook.com/${FACEBOOK_API_VERSION}/${id}/photos?access_token=${accessToken}`,
                   {
                     method: 'POST',
                     headers: {
@@ -472,7 +547,7 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
         ...all
       } = await (
         await this.fetch(
-          `https://graph.facebook.com/v20.0/${id}/feed?access_token=${accessToken}&fields=id,permalink_url`,
+          `https://graph.facebook.com/${FACEBOOK_API_VERSION}/${id}/feed?access_token=${accessToken}&fields=id,permalink_url`,
           {
             method: 'POST',
             headers: {
@@ -484,7 +559,16 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
                 ? { link: firstPost.settings.url }
                 : {}),
               message: firstPost.message,
-              published: true,
+              published: !firstPost.settings.scheduled_publish_time,
+              ...(firstPost.settings.scheduled_publish_time
+                ? {
+                    scheduled_publish_time:
+                      firstPost.settings.scheduled_publish_time,
+                  }
+                : {}),
+              ...(firstPost.settings.crosspost_pages?.length
+                ? { crosspost_pages: firstPost.settings.crosspost_pages }
+                : {}),
             }),
           },
           'finalize upload'
@@ -518,7 +602,7 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
 
     const data = await (
       await this.fetch(
-        `https://graph.facebook.com/v20.0/${replyToId}/comments?access_token=${accessToken}&fields=id,permalink_url`,
+        `https://graph.facebook.com/${FACEBOOK_API_VERSION}/${replyToId}/comments?access_token=${accessToken}&fields=id,permalink_url`,
         {
           method: 'POST',
           headers: {
@@ -553,31 +637,99 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
     const until = dayjs().endOf('day').unix();
     const since = dayjs().subtract(date, 'day').unix();
 
+    // Avoid legacy reach/impression metrics that are being deprecated in newer Meta API versions.
+    const metrics = [
+      'page_post_engagements',
+      'page_daily_follows',
+      'page_video_views',
+      'page_views_total',
+      'page_fan_adds_unique',
+      'page_fan_removes_unique',
+      'page_actions_post_reactions_total',
+    ].join(',');
+
     const { data } = await (
       await fetch(
-        `https://graph.facebook.com/v20.0/${id}/insights?metric=page_impressions_unique,page_posts_impressions_unique,page_post_engagements,page_daily_follows,page_video_views&access_token=${accessToken}&period=day&since=${since}&until=${until}`
+        `https://graph.facebook.com/${FACEBOOK_API_VERSION}/${id}/insights?metric=${metrics}&access_token=${accessToken}&period=day&since=${since}&until=${until}`
       )
     ).json();
 
+    const labelMap: Record<string, string> = {
+      page_post_engagements: 'Post Engagement',
+      page_daily_follows: 'New Followers',
+      page_video_views: 'Video Views',
+      page_views_total: 'Page Views',
+      page_fan_adds_unique: 'New Fans',
+      page_fan_removes_unique: 'Unfollows',
+      page_actions_post_reactions_total: 'Reactions',
+    };
+
     return (
-      data?.map((d: any) => ({
-        label:
-          d.name === 'page_impressions_unique'
-            ? 'Page Impressions'
-            : d.name === 'page_post_engagements'
-            ? 'Posts Engagement'
-            : d.name === 'page_daily_follows'
-            ? 'Page followers'
-            : d.name === 'page_video_views'
-            ? 'Videos views'
-            : 'Posts Impressions',
-        percentageChange: 5,
-        data: d?.values?.map((v: any) => ({
-          total: v.value,
-          date: dayjs(v.end_time).format('YYYY-MM-DD'),
-        })),
-      })) || []
+      data?.map((metric: any) => {
+        const points = (metric?.values || []).map((value: any) => ({
+          total: toMetricValue(value.value),
+          date: dayjs(value.end_time).format('YYYY-MM-DD'),
+        }));
+
+        return {
+          label: labelMap[metric.name] || metric.name,
+          percentageChange: getPercentageChange(
+            points.map((point: { total: number }) => point.total)
+          ),
+          data: points,
+        };
+      }) || []
     );
+  }
+
+  /**
+   * Fetch audience demographics for a Facebook Page
+   * Returns age/gender, city, and country breakdowns
+   */
+  async demographics(
+    id: string,
+    accessToken: string
+  ): Promise<{
+    ageGender: Record<string, number>;
+    cities: Record<string, number>;
+    countries: Record<string, number>;
+  }> {
+    const metrics = [
+      'page_fans_gender_age',
+      'page_fans_city',
+      'page_fans_country',
+    ].join(',');
+
+    try {
+      const { data } = await (
+        await this.fetch(
+          `https://graph.facebook.com/${FACEBOOK_API_VERSION}/${id}/insights` +
+            `?metric=${metrics}&period=lifetime&access_token=${accessToken}`
+        )
+      ).json();
+
+      const result: any = { ageGender: {}, cities: {}, countries: {} };
+
+      for (const metric of data || []) {
+        const value = metric.values?.[0]?.value || {};
+        switch (metric.name) {
+          case 'page_fans_gender_age':
+            result.ageGender = value;
+            break;
+          case 'page_fans_city':
+            result.cities = value;
+            break;
+          case 'page_fans_country':
+            result.countries = value;
+            break;
+        }
+      }
+
+      return result;
+    } catch (err) {
+      console.error('Error fetching Facebook demographics:', err);
+      return { ageGender: {}, cities: {}, countries: {} };
+    }
   }
 
   async postAnalytics(
@@ -592,7 +744,7 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
       // Fetch post insights from Facebook Graph API
       const { data } = await (
         await this.fetch(
-          `https://graph.facebook.com/v20.0/${postId}/insights?metric=post_impressions_unique,post_reactions_by_type_total,post_clicks,post_clicks_by_type&access_token=${accessToken}`
+          `https://graph.facebook.com/${FACEBOOK_API_VERSION}/${postId}/insights?metric=post_reactions_by_type_total,post_clicks,post_clicks_by_type&access_token=${accessToken}`
         )
       ).json();
 
@@ -610,10 +762,6 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
         let total = '';
 
         switch (metric.name) {
-          case 'post_impressions_unique':
-            label = 'Impressions';
-            total = String(value);
-            break;
           case 'post_clicks':
             label = 'Clicks';
             total = String(value);
@@ -655,5 +803,191 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
       return [];
     }
   }
-}
 
+  // ── Comments Management ─────────────────────────────
+
+  /**
+   * Fetch comments on a Facebook Page post
+   * GET /{post-id}/comments?fields=id,message,from,created_time,like_count,is_hidden,comments{id,message,from,created_time,like_count,is_hidden}
+   */
+  async fetchComments(
+    _pageId: string,
+    accessToken: string,
+    postId: string
+  ) {
+    const { data } = await (
+      await this.fetch(
+        `https://graph.facebook.com/${FACEBOOK_API_VERSION}/${postId}/comments` +
+          `?fields=id,message,from,created_time,like_count,is_hidden,attachment,` +
+          `comments{id,message,from,created_time,like_count,is_hidden}` +
+          `&limit=100&order=reverse_chronological` +
+          `&access_token=${accessToken}`
+      )
+    ).json();
+
+    if (!data) return [];
+
+    return data.map((comment: any) => ({
+      externalCommentId: comment.id,
+      authorId: comment.from?.id || 'unknown',
+      authorName: comment.from?.name || 'Unknown',
+      authorPicture: comment.from?.id
+        ? `https://graph.facebook.com/${FACEBOOK_API_VERSION}/${comment.from.id}/picture?type=small`
+        : undefined,
+      content: comment.message || '',
+      likeCount: comment.like_count || 0,
+      isHidden: comment.is_hidden || false,
+      createdAt: comment.created_time,
+      replies: (comment.comments?.data || []).map((reply: any) => ({
+        externalCommentId: reply.id,
+        authorId: reply.from?.id || 'unknown',
+        authorName: reply.from?.name || 'Unknown',
+        authorPicture: reply.from?.id
+          ? `https://graph.facebook.com/${FACEBOOK_API_VERSION}/${reply.from.id}/picture?type=small`
+          : undefined,
+        content: reply.message || '',
+        likeCount: reply.like_count || 0,
+        isHidden: reply.is_hidden || false,
+        createdAt: reply.created_time,
+      })),
+    }));
+  }
+
+  /**
+   * Reply to a comment on a Facebook Page post
+   * POST /{comment-id}/comments
+   */
+  async replyToExternalComment(
+    _pageId: string,
+    accessToken: string,
+    commentId: string,
+    message: string
+  ) {
+    const result = await (
+      await this.fetch(
+        `https://graph.facebook.com/${FACEBOOK_API_VERSION}/${commentId}/comments`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message,
+            access_token: accessToken,
+          }),
+        }
+      )
+    ).json();
+
+    return { commentId: result.id, success: true };
+  }
+
+  /**
+   * Hide or unhide a comment on a Facebook Page post
+   * POST /{comment-id}?is_hidden=true|false
+   */
+  async hideExternalComment(
+    _pageId: string,
+    accessToken: string,
+    commentId: string,
+    hide: boolean
+  ) {
+    await this.fetch(
+      `https://graph.facebook.com/${FACEBOOK_API_VERSION}/${commentId}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          is_hidden: hide,
+          access_token: accessToken,
+        }),
+      }
+    );
+
+    return { success: true, isHidden: hide };
+  }
+
+  /**
+   * Delete a comment on a Facebook Page post (own page comments only)
+   * DELETE /{comment-id}
+   */
+  async deleteExternalComment(
+    _pageId: string,
+    accessToken: string,
+    commentId: string
+  ) {
+    await this.fetch(
+      `https://graph.facebook.com/${FACEBOOK_API_VERSION}/${commentId}?access_token=${accessToken}`,
+      { method: 'DELETE' }
+    );
+
+    return { success: true };
+  }
+
+  /**
+   * Like or unlike a comment on a Facebook Page post
+   * POST/DELETE /{comment-id}/likes
+   */
+  async likeExternalComment(
+    _pageId: string,
+    accessToken: string,
+    commentId: string,
+    like = true
+  ) {
+    await this.fetch(
+      `https://graph.facebook.com/${FACEBOOK_API_VERSION}/${commentId}/likes?access_token=${accessToken}`,
+      { method: like ? 'POST' : 'DELETE' }
+    );
+
+    return { success: true };
+  }
+
+  async contentRanking(id: string, accessToken: string, date: number) {
+    const since = dayjs().subtract(date, 'day').unix();
+    const { data } = await (
+      await this.fetch(
+        metaGraphUrl(
+          `/${id}/posts?fields=id,message,created_time,permalink_url,insights.metric(post_clicks,post_reactions_by_type_total,post_video_views)&since=${since}&limit=50&access_token=${accessToken}`
+        )
+      )
+    ).json();
+
+    return (data || [])
+      .map((post: any) => {
+        const score = (post.insights?.data || []).reduce((all: number, metric: any) => {
+          const value = metric.values?.[0]?.value;
+          if (typeof value === 'number') return all + value;
+          if (typeof value === 'object' && value) {
+            return all + Object.values(value).reduce((sum: number, current: any) => sum + Number(current || 0), 0);
+          }
+          return all;
+        }, 0);
+        return {
+          id: post.id,
+          message: post.message || '',
+          createdAt: post.created_time,
+          url: post.permalink_url,
+          score,
+        };
+      })
+      .sort((a: any, b: any) => b.score - a.score);
+  }
+
+  async scheduleLiveVideo(
+    id: string,
+    accessToken: string,
+    data: { title: string; description?: string; planned_start_time?: number; status?: string }
+  ) {
+    return (
+      await this.fetch(metaGraphUrl(`/${id}/live_videos`), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: data.title,
+          description: data.description,
+          planned_start_time: data.planned_start_time,
+          status: data.status || 'SCHEDULED_UNPUBLISHED',
+          access_token: accessToken,
+        }),
+      })
+    ).json();
+  }
+}

@@ -157,6 +157,14 @@ const initialState = {
   chars: {},
 };
 
+const NON_POSTING_INTEGRATIONS = [
+  'facebook-ads',
+  'facebook-messages',
+  'instagram-messages',
+  'tiktok-business',
+  'whatsapp',
+];
+
 export const useLaunchStore = create<StoreState>()((set) => ({
   ...initialState,
   setCurrent: (current: string) =>
@@ -515,7 +523,10 @@ export const useLaunchStore = create<StoreState>()((set) => ({
     })),
   setAllIntegrations: (integrations: Integrations[]) =>
     set((state) => ({
-      integrations: integrations,
+      integrations: integrations.filter(
+        (integration) =>
+          !NON_POSTING_INTEGRATIONS.includes(integration.identifier)
+      ),
     })),
   setTab: (tab: 0 | 1) =>
     set((state) => ({

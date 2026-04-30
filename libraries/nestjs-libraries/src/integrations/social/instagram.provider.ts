@@ -12,6 +12,7 @@ import { SocialAbstract } from '@gitroom/nestjs-libraries/integrations/social.ab
 import { InstagramDto } from '@gitroom/nestjs-libraries/dtos/posts/providers-settings/instagram.dto';
 import { Integration } from '@prisma/client';
 import { Rules } from '@gitroom/nestjs-libraries/chat/rules.description.decorator';
+import { metaGraphUrl } from '@gitroom/nestjs-libraries/integrations/social/meta/meta-api.constants';
 
 @Rules(
   "Instagram should have at least one attachment, if it's a story, it can have only one picture"
@@ -31,7 +32,9 @@ export class InstagramProvider
     'business_management',
     'instagram_content_publish',
     'instagram_manage_comments',
+    'instagram_manage_engagement',
     'instagram_manage_insights',
+    'catalog_management',
   ];
   override maxConcurrentJob = 400;
   editor = 'normal' as const;
@@ -577,9 +580,27 @@ export class InstagramProvider
               )}`
             : ``;
 
+        const enhancedParams = [
+          firstPost.settings.location_id
+            ? `location_id=${encodeURIComponent(firstPost.settings.location_id)}`
+            : '',
+          firstPost.settings.branded_content_tag
+            ? `branded_content_tag=${encodeURIComponent(firstPost.settings.branded_content_tag)}`
+            : '',
+          firstPost.settings.audio_clip_id
+            ? `audio_clip_id=${encodeURIComponent(firstPost.settings.audio_clip_id)}`
+            : '',
+          firstPost.settings.product_tags?.length
+            ? `product_tags=${encodeURIComponent(JSON.stringify(firstPost.settings.product_tags))}`
+            : '',
+        ]
+          .filter(Boolean)
+          .map((param) => `&${param}`)
+          .join('');
+
         const { id: photoId } = await (
           await this.fetch(
-            `https://${type}/v20.0/${id}/media?${mediaType}${isCarousel}${collaborators}${trialParams}&access_token=${accessToken}${caption}`,
+            `https://${type}/v20.0/${id}/media?${mediaType}${isCarousel}${collaborators}${trialParams}${enhancedParams}&access_token=${accessToken}${caption}`,
             {
               method: 'POST',
             }
@@ -669,7 +690,15 @@ export class InstagramProvider
             firstPost?.message
           )}&media_type=CAROUSEL&children=${encodeURIComponent(
             medias.join(',')
-          )}&access_token=${accessToken}`,
+          )}${
+            firstPost.settings.product_tags?.length
+              ? `&product_tags=${encodeURIComponent(JSON.stringify(firstPost.settings.product_tags))}`
+              : ''
+          }${
+            firstPost.settings.location_id
+              ? `&location_id=${encodeURIComponent(firstPost.settings.location_id)}`
+              : ''
+          }&access_token=${accessToken}`,
           {
             method: 'POST',
           }
@@ -851,11 +880,59 @@ export class InstagramProvider
     return analytics;
   }
 
+  /**
+   * Fetch audience demographics for an Instagram Business Account
+   */
+  async demographics(
+    id: string,
+    accessToken: string,
+    type = 'graph.facebook.com'
+  ): Promise<{
+    ageGender: Record<string, number>;
+    cities: Record<string, number>;
+    countries: Record<string, number>;
+  }> {
+    const metrics = [
+      'audience_gender_age',
+      'audience_city',
+      'audience_country',
+    ].join(',');
+
+    try {
+      const { data } = await (
+        await this.fetch(
+          `https://${type}/v21.0/${id}/insights` +
+            `?metric=${metrics}&period=lifetime&access_token=${accessToken}`
+        )
+      ).json();
+
+      const result: any = { ageGender: {}, cities: {}, countries: {} };
+
+      for (const metric of data || []) {
+        const value = metric.values?.[0]?.value || {};
+        switch (metric.name) {
+          case 'audience_gender_age':
+            result.ageGender = value;
+            break;
+          case 'audience_city':
+            result.cities = value;
+            break;
+          case 'audience_country':
+            result.countries = value;
+            break;
+        }
+      }
+
+      return result;
+    } catch (err) {
+      console.error('Error fetching Instagram demographics:', err);
+      return { ageGender: {}, cities: {}, countries: {} };
+    }
+  }
+
   music(accessToken: string, data: { q: string }) {
     return this.fetch(
-      `https://graph.facebook.com/v20.0/music/search?q=${encodeURIComponent(
-        data.q
-      )}&access_token=${accessToken}`
+      `${metaGraphUrl('/music/search')}?q=${encodeURIComponent(data.q)}&access_token=${accessToken}`
     );
   }
 
@@ -926,5 +1003,208 @@ export class InstagramProvider
       console.error('Error fetching Instagram post analytics:', err);
       return [];
     }
+  }
+
+  // ── Comments Management ─────────────────────────────
+
+  /**
+   * Fetch comments on an Instagram media post
+   * GET /{media-id}/comments?fields=id,text,username,from,timestamp,like_count,replies{id,text,username,from,timestamp,like_count}
+   */
+  async fetchComments(
+    _igUserId: string,
+    accessToken: string,
+    mediaId: string
+  ) {
+    const { data } = await (
+      await this.fetch(
+        `https://graph.facebook.com/v20.0/${mediaId}/comments` +
+          `?fields=id,text,username,from,timestamp,like_count,hidden,` +
+          `replies{id,text,username,from,timestamp,like_count,hidden}` +
+          `&limit=100` +
+          `&access_token=${accessToken}`
+      )
+    ).json();
+
+    if (!data) return [];
+
+    return data.map((comment: any) => ({
+      externalCommentId: comment.id,
+      authorId: comment.from?.id || comment.username || 'unknown',
+      authorName: comment.username || comment.from?.username || 'Unknown',
+      content: comment.text || '',
+      likeCount: comment.like_count || 0,
+      isHidden: comment.hidden || false,
+      createdAt: comment.timestamp,
+      replies: (comment.replies?.data || []).map((reply: any) => ({
+        externalCommentId: reply.id,
+        authorId: reply.from?.id || reply.username || 'unknown',
+        authorName: reply.username || reply.from?.username || 'Unknown',
+        content: reply.text || '',
+        likeCount: reply.like_count || 0,
+        isHidden: reply.hidden || false,
+        createdAt: reply.timestamp,
+      })),
+    }));
+  }
+
+  /**
+   * Reply to a comment on an Instagram media post
+   * POST /{comment-id}/replies
+   */
+  async replyToExternalComment(
+    _igUserId: string,
+    accessToken: string,
+    commentId: string,
+    message: string
+  ) {
+    const result = await (
+      await this.fetch(
+        `https://graph.facebook.com/v20.0/${commentId}/replies`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message,
+            access_token: accessToken,
+          }),
+        }
+      )
+    ).json();
+
+    return { commentId: result.id, success: true };
+  }
+
+  /**
+   * Delete a comment on Instagram (own comments only)
+   * DELETE /{comment-id}
+   */
+  async deleteExternalComment(
+    _igUserId: string,
+    accessToken: string,
+    commentId: string
+  ) {
+    await this.fetch(
+      `https://graph.facebook.com/v20.0/${commentId}?access_token=${accessToken}`,
+      { method: 'DELETE' }
+    );
+
+    return { success: true };
+  }
+
+  /**
+   * Hide/unhide a comment on Instagram
+   * POST /{comment-id}?hide=true|false
+   */
+  async hideExternalComment(
+    _igUserId: string,
+    accessToken: string,
+    commentId: string,
+    hide: boolean
+  ) {
+    await this.fetch(
+      `https://graph.facebook.com/v20.0/${commentId}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          hide,
+          access_token: accessToken,
+        }),
+      }
+    );
+
+    return { success: true, isHidden: hide };
+  }
+
+  async likeExternalComment(
+    _igUserId: string,
+    accessToken: string,
+    commentId: string,
+    like = true
+  ) {
+    await this.fetch(
+      `${metaGraphUrl(`/${commentId}/likes`)}?access_token=${accessToken}`,
+      { method: like ? 'POST' : 'DELETE' }
+    );
+
+    return { success: true };
+  }
+
+  async contentRanking(id: string, accessToken: string, date: number) {
+    const since = dayjs().subtract(date, 'day').unix();
+    const { data } = await (
+      await this.fetch(
+        `${metaGraphUrl(`/${id}/media`)}?fields=id,caption,media_type,permalink,timestamp,like_count,comments_count&since=${since}&limit=50&access_token=${accessToken}`
+      )
+    ).json();
+
+    return (data || [])
+      .map((media: any) => ({
+        id: media.id,
+        message: media.caption || '',
+        type: media.media_type,
+        createdAt: media.timestamp,
+        url: media.permalink,
+        score: Number(media.like_count || 0) + Number(media.comments_count || 0),
+      }))
+      .sort((a: any, b: any) => b.score - a.score);
+  }
+
+  async searchLocations(accessToken: string, query: string) {
+    return (
+      await this.fetch(
+        `${metaGraphUrl('/search')}?type=adgeolocation&q=${encodeURIComponent(query)}&access_token=${accessToken}`
+      )
+    ).json();
+  }
+
+  async searchProducts(accessToken: string, catalogId: string, query = '') {
+    return (
+      await this.fetch(
+        `${metaGraphUrl(`/${catalogId}/products`)}?fields=id,name,retailer_id,image_url,url,price,availability&limit=50${query ? `&filter=${encodeURIComponent(JSON.stringify({ name: { i_contains: query } }))}` : ''}&access_token=${accessToken}`
+      )
+    ).json();
+  }
+
+  async listCatalogs(id: string, accessToken: string) {
+    const { data } = await (
+      await this.fetch(
+        `${metaGraphUrl(`/${id}/owned_product_catalogs`)}?fields=id,name,product_count&limit=100&access_token=${accessToken}`
+      )
+    ).json();
+
+    return data || [];
+  }
+
+  async listProducts(_id: string, accessToken: string, catalogId: string) {
+    const { data } = await (
+      await this.fetch(
+        `${metaGraphUrl(`/${catalogId}/products`)}?fields=id,name,retailer_id,description,image_url,url,price,availability&limit=100&access_token=${accessToken}`
+      )
+    ).json();
+    return data || [];
+  }
+
+  async createProduct(_id: string, accessToken: string, catalogId: string, input: any) {
+    return (
+      await this.fetch(metaGraphUrl(`/${catalogId}/products`), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          retailer_id: input.retailerId,
+          name: input.name,
+          description: input.description,
+          price: input.price,
+          currency: input.currency,
+          availability: input.availability,
+          condition: input.condition,
+          image_url: input.imageUrl,
+          url: input.url,
+          ...(input.payload || {}),
+          access_token: accessToken,
+        }),
+      })
+    ).json();
   }
 }
