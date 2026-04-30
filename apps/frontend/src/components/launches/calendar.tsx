@@ -950,7 +950,13 @@ export const CalendarColumn: FC<{
                           />
                         ) : (
                           <SafeImage
-                            src={`/icons/platforms/${selectedIntegrations.identifier}.png`}
+                            src={`/icons/platforms/${
+                              ['facebook-ads', 'facebook-messages'].includes(
+                                selectedIntegrations.identifier
+                              )
+                                ? 'facebook'
+                                : selectedIntegrations.identifier
+                            }.png`}
                             className="rounded-[8px] absolute z-10 -bottom-[5px] -end-[5px] border border-fifth"
                             alt={selectedIntegrations.identifier}
                             width={20}

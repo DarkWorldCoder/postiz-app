@@ -5,6 +5,7 @@ import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
 import { ChartSocial } from '@gitroom/frontend/components/analytics/chart-social';
 import { LoadingComponent } from '@gitroom/frontend/components/layout/loading';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
+import { DemographicsAnalytics } from '@gitroom/frontend/components/platform-analytics/demographics.analytics';
 
 interface AnalyticsDataItem {
   label: string;
@@ -237,18 +238,21 @@ export const RenderAnalytics: FC<{
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[16px]">
-      {data?.length === 0 && (
-        <EmptyState onRefresh={refreshChannel(integration as any)} />
-      )}
-      {data?.map((item: AnalyticsDataItem, index: number) => (
-        <AnalyticsCard
-          key={`analytics-${index}`}
-          item={item}
-          total={totals[index]}
-          index={index}
-        />
-      ))}
-    </div>
+    <>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[16px]">
+        {data?.length === 0 && (
+          <EmptyState onRefresh={refreshChannel(integration as any)} />
+        )}
+        {data?.map((item: AnalyticsDataItem, index: number) => (
+          <AnalyticsCard
+            key={`analytics-${index}`}
+            item={item}
+            total={totals[index]}
+            index={index}
+          />
+        ))}
+      </div>
+      <DemographicsAnalytics integration={integration} />
+    </>
   );
 };

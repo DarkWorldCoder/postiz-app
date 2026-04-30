@@ -5,6 +5,11 @@ import { withSentryConfig } from '@sentry/nextjs';
 const nextConfig = {
   experimental: {
     proxyTimeout: 90_000,
+    turbo: {
+      resolveAlias: {
+        '@noble/hashes/_assert': './noble-hashes-assert-shim.mjs',
+      },
+    },
   },
   // Document-Policy header for browser profiling
   async headers() {
@@ -21,7 +26,7 @@ const nextConfig = {
     ];
   },
   reactStrictMode: false,
-  transpilePackages: ['crypto-hash'],
+  transpilePackages: ['crypto-hash', 'ethereum-cryptography', '@noble/hashes', '@solana/wallet-adapter-torus', '@toruslabs/solana-embed', '@toruslabs/openlogin-jrpc', '@toruslabs/base-controllers'],
   // Enable production sourcemaps for Sentry
   productionBrowserSourceMaps: true,
 
@@ -31,6 +36,15 @@ const nextConfig = {
     if (!dev) {
       config.devtool = isServer ? 'source-map' : 'hidden-source-map';
     }
+
+    // Fix: ethereum-cryptography expects `import assert from "@noble/hashes/_assert"`
+    // but @noble/hashes v1.8.0 only exports named members. Alias to a compat shim.
+    config.resolve = config.resolve || {};
+    config.resolve.alias = config.resolve.alias || {};
+    config.resolve.alias['@noble/hashes/_assert'] = new URL(
+      './noble-hashes-assert-shim.mjs',
+      import.meta.url
+    ).pathname;
 
     return config;
   },

@@ -174,7 +174,7 @@ export function useUppyUploader(props: {
       transloadit
     );
 
-    uppy2.use(plugin, options);
+    (uppy2 as any).use(plugin, options);
     if (!disableImageCompression) {
       uppy2.use(CompressionWrapper, {
         convertTypes: ['image/jpeg', 'image/png', 'image/webp'],
@@ -187,7 +187,8 @@ export function useUppyUploader(props: {
     uppy2.on('file-added', (file) => {
       setLocked(true);
       uppy2.setFileMeta(file.id, {
-        useCloudflare: storageProvider === 'cloudflare' ? 'true' : 'false', // Example of adding a custom field
+        useCloudflare: storageProvider === 'cloudflare' ? 'true' : 'false',
+        storageProvider,
         addedOrder: fileOrderIndex++, // Track original order for sorting after upload
         // Add more fields as needed
       });
@@ -225,7 +226,11 @@ export function useUppyUploader(props: {
       if (transloadit.length > 0) {
         // @ts-ignore
         const allRes = result.transloadit[0].results;
-        const toSave = uniqBy<{ name: string; originalName: string; order: number }>(
+        const toSave = uniqBy<{
+          name: string;
+          originalName: string;
+          order: number;
+        }>(
           // @ts-ignore
           Object.values(allRes).flatMap((p: any[]) => {
             return p.flatMap((item) => ({

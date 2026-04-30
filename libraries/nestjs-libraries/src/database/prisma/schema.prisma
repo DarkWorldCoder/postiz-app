@@ -43,6 +43,9 @@ model Organization {
   webhooks            Webhooks[]
   oauthApp            OAuthApp[]
   oauthAuthorizations OAuthAuthorization[]
+  commentModerationRules CommentModerationRule[]
+  metaWebhookEvents   MetaWebhookEvent[]
+  contentSuggestions  ContentSuggestion[]
 
   @@index([apiKey])
   @@index([streakSince])
@@ -341,6 +344,16 @@ model Integration {
   orderItems            OrderItems[]
   plugs                 Plugs[]
   posts                 Post[]
+  socialInboxConversations SocialInboxConversation[]
+  socialInboxSyncState  SocialInboxSyncState?
+  socialComments        SocialComment[]
+  adCampaigns           AdCampaign[]
+  adCreatives           AdCreative[]
+  leadForms             LeadForm[]
+  commerceCatalogs      CommerceCatalog[]
+  metaAudiences         MetaAudience[]
+  metaWebhookEvents     MetaWebhookEvent[]
+  contentSuggestions    ContentSuggestion[]
 
   @@unique([organizationId, internalId])
   @@index([rootInternalId])
@@ -353,6 +366,83 @@ model Integration {
   @@index([inBetweenSteps])
   @@index([refreshNeeded])
   @@index([disabled])
+}
+
+enum SocialInboxDirection {
+  INBOUND
+  OUTBOUND
+  SYSTEM
+}
+
+enum SocialInboxChannel {
+  FACEBOOK
+  INSTAGRAM
+  WHATSAPP
+  FB_COMMENT
+  IG_COMMENT
+  TIKTOK
+}
+
+model SocialInboxConversation {
+  id                    String               @id @default(cuid())
+  integrationId         String
+  channel               SocialInboxChannel   @default(FACEBOOK)
+  externalConversationId String?
+  participantId         String
+  participantName       String?
+  participantPicture    String?
+  pageScopedUserId      String?
+  snippet               String?
+  unreadCount           Int                  @default(0)
+  lastMessageAt         DateTime?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  deletedAt             DateTime?
+  integration           Integration          @relation(fields: [integrationId], references: [id])
+  messages              SocialInboxMessage[]
+
+  @@unique([integrationId, participantId])
+  @@index([integrationId])
+  @@index([externalConversationId])
+  @@index([lastMessageAt])
+  @@index([updatedAt])
+  @@index([deletedAt])
+}
+
+model SocialInboxMessage {
+  id               String                 @id @default(cuid())
+  conversationId   String
+  externalMessageId String
+  senderId         String
+  senderName       String?
+  direction        SocialInboxDirection
+  content          String?
+  messageType      String?                @default("text")
+  sentAt           DateTime
+  isEcho           Boolean                @default(false)
+  rawPayload       String?
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+  deletedAt        DateTime?
+  conversation     SocialInboxConversation @relation(fields: [conversationId], references: [id])
+
+  @@unique([conversationId, externalMessageId])
+  @@index([conversationId])
+  @@index([sentAt])
+  @@index([deletedAt])
+}
+
+model SocialInboxSyncState {
+  id                 String      @id @default(cuid())
+  integrationId      String      @unique
+  afterCursor        String?
+  lastSyncedAt       DateTime?
+  lastWebhookAt      DateTime?
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  integration        Integration @relation(fields: [integrationId], references: [id])
+
+  @@index([integrationId])
 }
 
 model Signatures {
@@ -956,4 +1046,304 @@ model Announcement {
   description String
   color       AnnouncementColor @default(INFO)
   createdAt   DateTime          @default(now())
+}
+
+// ──────────────────────────────────────────────
+// Social Comments Management (Meta Integration)
+// ──────────────────────────────────────────────
+
+model SocialComment {
+  id                String           @id @default(cuid())
+  integrationId     String
+  postReleaseId     String           // external post ID on the platform
+  externalCommentId String
+  parentCommentId   String?          // for nested replies
+  authorId          String
+  authorName        String
+  authorPicture     String?
+  content           String
+  likeCount         Int              @default(0)
+  isHidden          Boolean          @default(false)
+  sentiment         String?          // positive / negative / neutral
+  platformCreatedAt DateTime
+  syncedAt          DateTime         @default(now())
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  deletedAt         DateTime?
+
+  integration       Integration      @relation(fields: [integrationId], references: [id])
+  parent            SocialComment?   @relation("CommentReplies", fields: [parentCommentId], references: [id])
+  replies           SocialComment[]  @relation("CommentReplies")
+
+  @@unique([integrationId, externalCommentId])
+  @@index([integrationId])
+  @@index([postReleaseId])
+  @@index([parentCommentId])
+  @@index([platformCreatedAt])
+  @@index([sentiment])
+  @@index([deletedAt])
+}
+
+enum ModerationAction {
+  HIDE
+  AUTO_REPLY
+  FLAG
+  DELETE
+}
+
+model CommentModerationRule {
+  id             String           @id @default(cuid())
+  organizationId String
+  name           String
+  action         ModerationAction @default(FLAG)
+  keywords       String           // JSON array of trigger words
+  replyTemplate  String?          // template for AUTO_REPLY action
+  isActive       Boolean          @default(true)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  deletedAt      DateTime?
+
+  organization   Organization     @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@index([isActive])
+  @@index([deletedAt])
+}
+
+// ──────────────────────────────────────────────
+// Meta Ads, Leads, Commerce, Audiences & Events
+// ──────────────────────────────────────────────
+
+model AdCampaign {
+  id               String      @id @default(cuid())
+  integrationId    String
+  externalId       String
+  name             String
+  objective        String
+  status           String      @default("PAUSED")
+  dailyBudget      Float?
+  lifetimeBudget   Float?
+  startDate        DateTime?
+  endDate          DateTime?
+  rawPayload       Json?
+  syncedAt         DateTime    @default(now())
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  deletedAt        DateTime?
+  integration      Integration @relation(fields: [integrationId], references: [id])
+  adSets           AdSet[]
+
+  @@unique([integrationId, externalId])
+  @@index([integrationId])
+  @@index([status])
+  @@index([deletedAt])
+}
+
+model AdSet {
+  id               String     @id @default(cuid())
+  campaignId       String
+  externalId       String
+  name             String
+  status           String     @default("PAUSED")
+  targeting        Json
+  bidStrategy      String?
+  budget           Float?
+  rawPayload       Json?
+  syncedAt         DateTime   @default(now())
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  deletedAt        DateTime?
+  campaign         AdCampaign @relation(fields: [campaignId], references: [id])
+  ads              Ad[]
+
+  @@unique([campaignId, externalId])
+  @@index([campaignId])
+  @@index([status])
+  @@index([deletedAt])
+}
+
+model AdCreative {
+  id               String      @id @default(cuid())
+  integrationId    String
+  externalId       String
+  name             String
+  creativeData     Json
+  rawPayload       Json?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  deletedAt        DateTime?
+  integration      Integration @relation(fields: [integrationId], references: [id])
+  ads              Ad[]
+
+  @@unique([integrationId, externalId])
+  @@index([integrationId])
+  @@index([deletedAt])
+}
+
+model Ad {
+  id               String     @id @default(cuid())
+  adSetId          String
+  creativeId       String?
+  externalId       String
+  name             String
+  status           String     @default("PAUSED")
+  creativeData     Json?
+  rawPayload       Json?
+  syncedAt         DateTime   @default(now())
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  deletedAt        DateTime?
+  adSet            AdSet      @relation(fields: [adSetId], references: [id])
+  creative         AdCreative? @relation(fields: [creativeId], references: [id])
+
+  @@unique([adSetId, externalId])
+  @@index([adSetId])
+  @@index([creativeId])
+  @@index([status])
+  @@index([deletedAt])
+}
+
+model LeadForm {
+  id               String      @id @default(cuid())
+  integrationId    String
+  externalFormId   String
+  name             String
+  status           String      @default("ACTIVE")
+  rawPayload       Json?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  deletedAt        DateTime?
+  integration      Integration @relation(fields: [integrationId], references: [id])
+  leads            Lead[]
+
+  @@unique([integrationId, externalFormId])
+  @@index([integrationId])
+  @@index([status])
+  @@index([deletedAt])
+}
+
+model Lead {
+  id               String    @id @default(cuid())
+  formId           String
+  externalLeadId   String
+  fieldData        Json
+  status           String    @default("NEW")
+  rawPayload       Json?
+  platformCreatedAt DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+  form             LeadForm  @relation(fields: [formId], references: [id])
+
+  @@unique([formId, externalLeadId])
+  @@index([formId])
+  @@index([status])
+  @@index([deletedAt])
+}
+
+model CommerceCatalog {
+  id               String      @id @default(cuid())
+  integrationId    String
+  externalCatalogId String
+  name             String
+  rawPayload       Json?
+  syncedAt         DateTime    @default(now())
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  deletedAt        DateTime?
+  integration      Integration @relation(fields: [integrationId], references: [id])
+  products         CommerceProduct[]
+
+  @@unique([integrationId, externalCatalogId])
+  @@index([integrationId])
+  @@index([deletedAt])
+}
+
+model CommerceProduct {
+  id               String          @id @default(cuid())
+  catalogId        String
+  externalProductId String
+  retailerId       String?
+  name             String
+  description      String?
+  price            String?
+  currency         String?
+  availability     String?
+  imageUrl         String?
+  productUrl       String?
+  rawPayload       Json?
+  syncedAt         DateTime        @default(now())
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  deletedAt        DateTime?
+  catalog          CommerceCatalog @relation(fields: [catalogId], references: [id])
+
+  @@unique([catalogId, externalProductId])
+  @@index([catalogId])
+  @@index([retailerId])
+  @@index([deletedAt])
+}
+
+model MetaAudience {
+  id               String      @id @default(cuid())
+  integrationId    String
+  externalAudienceId String
+  name             String
+  subtype          String?
+  status           String?
+  approximateCount Int?
+  rawPayload       Json?
+  syncedAt         DateTime    @default(now())
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  deletedAt        DateTime?
+  integration      Integration @relation(fields: [integrationId], references: [id])
+
+  @@unique([integrationId, externalAudienceId])
+  @@index([integrationId])
+  @@index([subtype])
+  @@index([status])
+  @@index([deletedAt])
+}
+
+model ContentSuggestion {
+  id               String       @id @default(cuid())
+  organizationId   String
+  integrationId    String?
+  type             String
+  input            Json?
+  result           Json
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  organization     Organization @relation(fields: [organizationId], references: [id])
+  integration      Integration? @relation(fields: [integrationId], references: [id])
+
+  @@index([organizationId])
+  @@index([integrationId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model MetaWebhookEvent {
+  id               String       @id @default(cuid())
+  organizationId   String?
+  integrationId    String?
+  objectType       String
+  eventType        String?
+  externalId       String?
+  payload          Json
+  processedAt      DateTime?
+  error            String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  organization     Organization? @relation(fields: [organizationId], references: [id])
+  integration      Integration? @relation(fields: [integrationId], references: [id])
+
+  @@index([organizationId])
+  @@index([integrationId])
+  @@index([objectType])
+  @@index([eventType])
+  @@index([externalId])
+  @@index([processedAt])
+  @@index([createdAt])
 }

@@ -9,7 +9,10 @@ import { DevToProvider } from '@gitroom/nestjs-libraries/integrations/social/dev
 import { HashnodeProvider } from '@gitroom/nestjs-libraries/integrations/social/hashnode.provider';
 import { MediumProvider } from '@gitroom/nestjs-libraries/integrations/social/medium.provider';
 import { FacebookProvider } from '@gitroom/nestjs-libraries/integrations/social/facebook.provider';
+import { FacebookAdsProvider } from '@gitroom/nestjs-libraries/integrations/social/facebook.ads.provider';
+import { FacebookMessagesProvider } from '@gitroom/nestjs-libraries/integrations/social/facebook.messages.provider';
 import { InstagramProvider } from '@gitroom/nestjs-libraries/integrations/social/instagram.provider';
+import { InstagramMessagesProvider } from '@gitroom/nestjs-libraries/integrations/social/instagram.messages.provider';
 import { YoutubeProvider } from '@gitroom/nestjs-libraries/integrations/social/youtube.provider';
 import { TiktokProvider } from '@gitroom/nestjs-libraries/integrations/social/tiktok.provider';
 import { PinterestProvider } from '@gitroom/nestjs-libraries/integrations/social/pinterest.provider';
@@ -24,7 +27,6 @@ import { LemmyProvider } from '@gitroom/nestjs-libraries/integrations/social/lem
 import { InstagramStandaloneProvider } from '@gitroom/nestjs-libraries/integrations/social/instagram.standalone.provider';
 import { FarcasterProvider } from '@gitroom/nestjs-libraries/integrations/social/farcaster.provider';
 import { TelegramProvider } from '@gitroom/nestjs-libraries/integrations/social/telegram.provider';
-import { NostrProvider } from '@gitroom/nestjs-libraries/integrations/social/nostr.provider';
 import { VkProvider } from '@gitroom/nestjs-libraries/integrations/social/vk.provider';
 import { WordpressProvider } from '@gitroom/nestjs-libraries/integrations/social/wordpress.provider';
 import { ListmonkProvider } from '@gitroom/nestjs-libraries/integrations/social/listmonk.provider';
@@ -36,6 +38,8 @@ import { MoltbookProvider } from '@gitroom/nestjs-libraries/integrations/social/
 import { SkoolProvider } from '@gitroom/nestjs-libraries/integrations/social/skool.provider';
 import { WhopProvider } from '@gitroom/nestjs-libraries/integrations/social/whop.provider';
 import { MeweProvider } from '@gitroom/nestjs-libraries/integrations/social/mewe.provider';
+import { WhatsAppProvider } from '@gitroom/nestjs-libraries/integrations/social/whatsapp.provider';
+import { TikTokBusinessProvider } from '@gitroom/nestjs-libraries/integrations/social/tiktok.business.provider';
 
 export const socialIntegrationList: Array<SocialAbstract & SocialProvider> = [
   new XProvider(),
@@ -45,10 +49,15 @@ export const socialIntegrationList: Array<SocialAbstract & SocialProvider> = [
   new InstagramProvider(),
   new InstagramStandaloneProvider(),
   new FacebookProvider(),
+  new FacebookAdsProvider(),
+  new FacebookMessagesProvider(),
+  new InstagramMessagesProvider(),
+  new WhatsAppProvider(),
   new ThreadsProvider(),
   new YoutubeProvider(),
   new GmbProvider(),
   new TiktokProvider(),
+  new TikTokBusinessProvider(),
   new PinterestProvider(),
   new DribbbleProvider(),
   new DiscordProvider(),
@@ -60,7 +69,6 @@ export const socialIntegrationList: Array<SocialAbstract & SocialProvider> = [
   new LemmyProvider(),
   new FarcasterProvider(),
   new TelegramProvider(),
-  new NostrProvider(),
   new VkProvider(),
   new MediumProvider(),
   new DevToProvider(),

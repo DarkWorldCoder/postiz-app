@@ -30,4 +30,16 @@ export class InstagramDto {
   @IsArray()
   @IsOptional()
   collaborators: Collaborators[];
+
+  @IsOptional()
+  location_id?: string;
+
+  @IsOptional()
+  branded_content_tag?: string;
+
+  @IsOptional()
+  product_tags?: Array<Record<string, any>>;
+
+  @IsOptional()
+  audio_clip_id?: string;
 }

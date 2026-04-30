@@ -37,6 +37,21 @@ import { OAuthAppController } from '@gitroom/backend/api/routes/oauth-app.contro
 import { ApprovedAppsController } from '@gitroom/backend/api/routes/approved-apps.controller';
 import { OAuthController, OAuthAuthorizedController } from '@gitroom/backend/api/routes/oauth.controller';
 import { AnnouncementsController } from '@gitroom/backend/api/routes/announcements.controller';
+import {
+  FacebookInboxWebhookController,
+  InboxController,
+} from '@gitroom/backend/api/routes/inbox.controller';
+import { CommentsController } from '@gitroom/backend/api/routes/comments.controller';
+import {
+  ContentSuggestionsController,
+  MetaAdsController,
+  MetaAudiencesController,
+  MetaCommerceController,
+  MetaLeadsController,
+  MetaWebhookController,
+  PlatformSubscriptionsController,
+  TikTokWebhookController,
+} from '@gitroom/backend/api/routes/meta-features.controller';
 import { AuthProviderManager } from '@gitroom/backend/services/auth/providers/providers.manager';
 import { GithubProvider } from '@gitroom/backend/services/auth/providers/github.provider';
 import { GoogleProvider } from '@gitroom/backend/services/auth/providers/google.provider';
@@ -63,6 +78,14 @@ const authenticatedController = [
   ApprovedAppsController,
   OAuthAuthorizedController,
   AnnouncementsController,
+  InboxController,
+  CommentsController,
+  MetaAdsController,
+  MetaLeadsController,
+  MetaCommerceController,
+  MetaAudiencesController,
+  ContentSuggestionsController,
+  PlatformSubscriptionsController,
 ];
 @Module({
   imports: [UploadModule],
@@ -75,6 +98,9 @@ const authenticatedController = [
     EnterpriseController,
     NoAuthIntegrationsController,
     OAuthController,
+    FacebookInboxWebhookController,
+    MetaWebhookController,
+    TikTokWebhookController,
     ...authenticatedController,
   ],
   providers: [

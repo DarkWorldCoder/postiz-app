@@ -40,6 +40,11 @@ import { OAuthRepository } from '@gitroom/nestjs-libraries/database/prisma/oauth
 import { OAuthService } from '@gitroom/nestjs-libraries/database/prisma/oauth/oauth.service';
 import { AnnouncementsRepository } from '@gitroom/nestjs-libraries/database/prisma/announcements/announcements.repository';
 import { AnnouncementsService } from '@gitroom/nestjs-libraries/database/prisma/announcements/announcements.service';
+import { SocialInboxRepository } from '@gitroom/nestjs-libraries/database/prisma/social-inbox/social-inbox.repository';
+import { SocialInboxService } from '@gitroom/nestjs-libraries/database/prisma/social-inbox/social-inbox.service';
+import { SocialCommentsRepository } from '@gitroom/nestjs-libraries/database/prisma/social-comments/social-comments.repository';
+import { SocialCommentsService } from '@gitroom/nestjs-libraries/database/prisma/social-comments/social-comments.service';
+import { MetaFeaturesService } from '@gitroom/nestjs-libraries/database/prisma/meta-features/meta-features.service';
 
 @Global()
 @Module({
@@ -89,6 +94,11 @@ import { AnnouncementsService } from '@gitroom/nestjs-libraries/database/prisma/
     VideoManager,
     AnnouncementsRepository,
     AnnouncementsService,
+    SocialInboxRepository,
+    SocialInboxService,
+    SocialCommentsRepository,
+    SocialCommentsService,
+    MetaFeaturesService,
   ],
   get exports() {
     return this.providers;

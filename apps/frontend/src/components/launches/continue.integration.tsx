@@ -255,10 +255,15 @@ export const ContinueIntegration: FC<{
   const providerDisplayName = useMemo(() => {
     const names: Record<string, string> = {
       facebook: 'Facebook',
+      'facebook-messages': 'Facebook Inbox',
       instagram: 'Instagram',
       'linkedin-page': 'LinkedIn',
       youtube: 'YouTube',
       gmb: 'Google Business',
+      'facebook-ads': 'Facebook Ads',
+      'instagram-messages': 'Instagram Inbox',
+      'tiktok-business': 'TikTok Business',
+      whatsapp: 'WhatsApp Business',
     };
     return names[provider] || provider;
   }, [provider]);

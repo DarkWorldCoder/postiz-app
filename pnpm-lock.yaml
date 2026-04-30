@@ -485,9 +485,6 @@ importers:
       nodemailer:
         specifier: ^7.0.11
         version: 7.0.13
-      nostr-tools:
-        specifier: ^2.18.2
-        version: 2.23.3(typescript@5.5.4)
       openai:
         specifier: ^6.2.0
         version: 6.27.0(ws@8.19.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(zod@3.25.76)
@@ -14416,17 +14413,6 @@ packages:
 
   normalize.css@8.0.1:
     resolution: {integrity: sha512-qizSNPO93t1YUuUhP22btGOo3chcvDFqFaj2TRybP0DMxkHOCTYwp3n34fel4a31ORXy4m1Xq0Gyqpb5m33qIg==}
-
-  nostr-tools@2.23.3:
-    resolution: {integrity: sha512-AALyt9k8xPdF4UV2mlLJ2mgCn4kpTB0DZ8t2r6wjdUh6anfx2cTVBsHUlo9U0EY/cKC5wcNyiMAmRJV5OVEalA==}
-    peerDependencies:
-      typescript: '>=5.0.0'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
-  nostr-wasm@0.1.0:
-    resolution: {integrity: sha512-78BTryCLcLYv96ONU8Ws3Q1JzjlAt+43pWQhIl86xZmWeegYCNLPml7yQ+gG3vR6V5h4XGj+TxO+SS5dsThQIA==}
 
   npm-run-path@2.0.2:
     resolution: {integrity: sha512-lJxZYlT4DW/bRUtFh1MQIWqmLwQfAxnqWG4HhEdjMlkrJYnJn0Jrr2u3mgxqaWsdiBc76TYkTG/mhrnYTuzfHw==}
@@ -35363,20 +35349,6 @@ snapshots:
   normalize-url@6.1.0: {}
 
   normalize.css@8.0.1: {}
-
-  nostr-tools@2.23.3(typescript@5.5.4):
-    dependencies:
-      '@noble/ciphers': 0.5.3
-      '@noble/curves': 1.9.7
-      '@noble/hashes': 1.8.0
-      '@scure/base': 1.2.6
-      '@scure/bip32': 1.7.0
-      '@scure/bip39': 1.6.0
-      nostr-wasm: 0.1.0
-    optionalDependencies:
-      typescript: 5.5.4
-
-  nostr-wasm@0.1.0: {}
 
   npm-run-path@2.0.2:
     dependencies:

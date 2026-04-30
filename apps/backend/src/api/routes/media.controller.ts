@@ -114,7 +114,7 @@ export class MediaController {
     return this._mediaService.saveFile(
       org.id,
       name,
-      process.env.CLOUDFLARE_BUCKET_URL + '/' + name,
+      UploadFactory.getBucketUrl() + '/' + name,
       originalName || undefined
     );
   }

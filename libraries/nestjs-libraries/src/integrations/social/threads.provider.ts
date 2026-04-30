@@ -462,6 +462,72 @@ export class ThreadsProvider extends SocialAbstract implements SocialProvider {
     );
   }
 
+  /**
+   * Fetch follower demographics for Threads account
+   */
+  async demographics(
+    id: string,
+    accessToken: string
+  ): Promise<{
+    countries: Record<string, number>;
+    cities: Record<string, number>;
+    ageGender: Record<string, number>;
+  }> {
+    const result: any = { countries: {}, cities: {}, ageGender: {} };
+
+    try {
+      // Follower demographics by country
+      const countryResp = await (
+        await fetch(
+          `https://graph.threads.net/v1.0/${id}/threads_insights` +
+            `?metric=follower_demographics&breakdown=country` +
+            `&access_token=${accessToken}`
+        )
+      ).json();
+
+      if (countryResp.data?.[0]?.total_value?.breakdowns?.[0]?.results) {
+        for (const item of countryResp.data[0].total_value.breakdowns[0].results) {
+          result.countries[item.dimension_values[0]] = item.value;
+        }
+      }
+
+      // Follower demographics by city
+      const cityResp = await (
+        await fetch(
+          `https://graph.threads.net/v1.0/${id}/threads_insights` +
+            `?metric=follower_demographics&breakdown=city` +
+            `&access_token=${accessToken}`
+        )
+      ).json();
+
+      if (cityResp.data?.[0]?.total_value?.breakdowns?.[0]?.results) {
+        for (const item of cityResp.data[0].total_value.breakdowns[0].results) {
+          result.cities[item.dimension_values[0]] = item.value;
+        }
+      }
+
+      // Follower demographics by age/gender
+      const ageGenderResp = await (
+        await fetch(
+          `https://graph.threads.net/v1.0/${id}/threads_insights` +
+            `?metric=follower_demographics&breakdown=age,gender` +
+            `&access_token=${accessToken}`
+        )
+      ).json();
+
+      if (ageGenderResp.data?.[0]?.total_value?.breakdowns?.[0]?.results) {
+        for (const item of ageGenderResp.data[0].total_value.breakdowns[0].results) {
+          const key = `${item.dimension_values[1]}.${item.dimension_values[0]}`;
+          result.ageGender[key] = item.value;
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching Threads demographics:', err);
+    }
+
+    return result;
+  }
+
   @Plug({
     identifier: 'threads-autoPlugPost',
     title: 'Auto plug post',
