@@ -30,14 +30,14 @@ services:
       - "traefik.http.routers.postiz.tls.certresolver=myresolver" # <--- Tell it to use Let's Encrypt
       - "traefik.http.routers.postiz.priority=1"
       - "traefik.http.services.postiz.loadbalancer.server.port=4200"
-      # Backend API router. Mirrors the old nginx /api -> backend:3000 behavior.
-      - "traefik.http.routers.postiz-api.rule=Host(`social.wiseadmit.io`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.postiz-api.entrypoints=websecure"
-      - "traefik.http.routers.postiz-api.tls.certresolver=myresolver"
-      - "traefik.http.routers.postiz-api.priority=100"
-      - "traefik.http.routers.postiz-api.middlewares=postiz-api-strip"
-      - "traefik.http.middlewares.postiz-api-strip.stripprefix.prefixes=/api"
-      - "traefik.http.services.postiz-api.loadbalancer.server.port=3000"
+      # # Backend API router. Mirrors the old nginx /api -> backend:3000 behavior.
+      # - "traefik.http.routers.postiz-api.rule=Host(`social.wiseadmit.io`) && PathPrefix(`/api`)"
+      # - "traefik.http.routers.postiz-api.entrypoints=websecure"
+      # - "traefik.http.routers.postiz-api.tls.certresolver=myresolver"
+      # - "traefik.http.routers.postiz-api.priority=100"
+      # - "traefik.http.routers.postiz-api.middlewares=postiz-api-strip"
+      # - "traefik.http.middlewares.postiz-api-strip.stripprefix.prefixes=/api"
+      # - "traefik.http.services.postiz-api.loadbalancer.server.port=3000"
     depends_on:
       postiz-postgres:
         condition: service_healthy
