@@ -52,6 +52,16 @@ export async function proxy(request: NextRequest) {
     return topResponse;
   }
 
+  const publicReviewPaths = [
+    '/',
+    '/privacy-policy',
+    '/terms-condition',
+    '/data-deletion',
+  ];
+  if (!authCookie && publicReviewPaths.includes(nextUrl.pathname)) {
+    return topResponse;
+  }
+
   if (
     nextUrl.pathname.startsWith('/integrations/social/') &&
     nextUrl.href.indexOf('state=login') === -1

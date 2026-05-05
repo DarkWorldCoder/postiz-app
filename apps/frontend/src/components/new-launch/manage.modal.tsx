@@ -23,6 +23,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { RepeatComponent } from '@gitroom/frontend/components/launches/repeat.component';
 import { TagsComponent } from '@gitroom/frontend/components/launches/tags.component';
 import { useToaster } from '@gitroom/react/toaster/toaster';
+import { getPlatformIcon } from '@gitroom/frontend/components/helpers/platform-icon';
 import { weightedLength } from '@gitroom/helpers/utils/count.length';
 import { deleteDialog } from '@gitroom/react/helpers/delete.dialog';
 import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
@@ -123,7 +124,7 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
       <div className="flex items-center gap-[10px]">
         <div className="relative">
           <img
-            src={`/icons/platforms/${currentIntegration.identifier}.png`}
+            src={getPlatformIcon(currentIntegration.identifier)}
             className="w-[20px] h-[20px] rounded-[4px]"
             alt={currentIntegration.identifier}
           />

@@ -8,6 +8,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { useExistingData } from '@gitroom/frontend/components/launches/helpers/use.existing.data';
 import { makeId } from '@gitroom/nestjs-libraries/services/make.is';
 import ImageWithFallback from '@gitroom/react/helpers/image.with.fallback';
+import { getPlatformIcon } from '@gitroom/frontend/components/helpers/platform-icon';
 
 export const PicksSocialsComponent: FC<{ toolTip?: boolean }> = ({
   toolTip,
@@ -80,31 +81,13 @@ export const PicksSocialsComponent: FC<{ toolTip?: boolean }> = ({
                       width={42}
                       height={42}
                     />
-                    {integration.identifier === 'youtube' ? (
-                      <img
-                        src="/icons/platforms/youtube.svg"
-                        className="absolute z-10 bottom-0 -end-[5px] min-w-[16px]"
-                        width={16}
-                      />
-                    ) : (
-                      <SafeImage
-                        src={`/icons/platforms/${
-                          ['facebook-ads', 'facebook-messages'].includes(
-                            integration.identifier
-                          )
-                            ? 'facebook'
-                            : integration.identifier === 'tiktok-business'
-                            ? 'tiktok'
-                            : integration.identifier === 'instagram-messages'
-                            ? 'instagram'
-                            : integration.identifier
-                        }.png`}
-                        className="rounded-[4px] absolute z-10 bottom-0 -end-[5px] min-w-[16px] min-h-[16px]"
-                        alt={integration.identifier}
-                        width={16}
-                        height={16}
-                      />
-                    )}
+                    <SafeImage
+                      src={getPlatformIcon(integration.identifier)}
+                      className="rounded-[4px] absolute z-10 bottom-0 -end-[5px] min-w-[16px] min-h-[16px]"
+                      alt={integration.identifier}
+                      width={16}
+                      height={16}
+                    />
                   </div>
                 </div>
               ))}

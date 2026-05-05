@@ -7,6 +7,7 @@ import clsx from 'clsx';
 import SafeImage from '@gitroom/react/helpers/safe.image';
 import { capitalize } from 'lodash';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
+import { getPlatformIcon } from '@gitroom/frontend/components/helpers/platform-icon';
 
 const Valid: FC = () => {
   return (
@@ -192,7 +193,7 @@ export const InformationComponent: FC<{
                 <Fragment key={p.integration.id}>
                   <div>
                     <SafeImage
-                      src={`/icons/platforms/${p.integration.identifier}.png`}
+                      src={getPlatformIcon(p.integration.identifier)}
                       alt={p.integration.name}
                       className="rounded-[4px] w-[16px] h-[16px] min-w-[16px] min-h-[16px]"
                       width={16}

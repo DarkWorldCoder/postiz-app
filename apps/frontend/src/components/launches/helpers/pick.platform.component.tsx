@@ -7,6 +7,7 @@ import SafeImage from '@gitroom/react/helpers/safe.image';
 import { useCopilotAction, useCopilotReadable } from '@copilotkit/react-core';
 import { useStateCallback } from '@gitroom/react/helpers/use.state.callback';
 import { timer } from '@gitroom/helpers/utils/timer';
+import { getPlatformIcon } from '@gitroom/frontend/components/helpers/platform-icon';
 export const PickPlatforms: FC<{
   integrations: Integrations[];
   selectedIntegrations: Integrations[];
@@ -251,27 +252,13 @@ export const PickPlatforms: FC<{
                           width={32}
                           height={32}
                         />
-                        {integration.identifier === 'youtube' ? (
-                          <img
-                            src="/icons/platforms/youtube.svg"
-                            className="absolute z-10 bottom-0 -end-[5px]"
-                            width={20}
-                          />
-                        ) : (
-                          <SafeImage
-                            src={`/icons/platforms/${
-                              ['facebook-ads', 'facebook-messages'].includes(
-                                integration.identifier
-                              )
-                                ? 'facebook'
-                                : integration.identifier
-                            }.png`}
-                            className="rounded-full absolute z-10 -bottom-[5px] -end-[5px] border border-fifth"
-                            alt={integration.identifier}
-                            width={20}
-                            height={20}
-                          />
-                        )}
+                        <SafeImage
+                          src={getPlatformIcon(integration.identifier)}
+                          className="rounded-full absolute z-10 -bottom-[5px] -end-[5px] border border-fifth"
+                          alt={integration.identifier}
+                          width={20}
+                          height={20}
+                        />
                       </div>
                     </div>
                   ) : (
@@ -297,7 +284,7 @@ export const PickPlatforms: FC<{
                               height={24}
                             />
                             <SafeImage
-                              src={`/icons/platforms/${integration.identifier}.png`}
+                              src={getPlatformIcon(integration.identifier)}
                               className="rounded-full absolute z-10 -bottom-[5px] -end-[5px] border border-fifth"
                               alt={integration.identifier}
                               width={15}

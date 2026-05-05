@@ -10,6 +10,7 @@ import removeMd from 'remove-markdown';
 import clsx from 'clsx';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 import { newDayjs } from '@gitroom/frontend/components/layout/set.timezone';
+import { getPlatformIcon } from '@gitroom/frontend/components/helpers/platform-icon';
 const postUrlEmitter = new EventEmitter();
 export const ShowPostSelector = () => {
   const [showPostSelector, setShowPostSelector] = useState(false);
@@ -180,11 +181,10 @@ export const PostSelector: FC<{
                             />
                             <img
                               className="w-[20px] h-[20px] rounded-full absolute z-10 -bottom-[5px] -end-[5px] border border-fifth"
-                              src={
-                                `/icons/platforms/` +
-                                p?.integration?.providerIdentifier +
-                                '.png'
-                              }
+                              src={getPlatformIcon(
+                                p?.integration?.providerIdentifier
+                              )}
+                              alt={p.integration.name}
                             />
                           </div>
                           <div>{p.integration.name}</div>

@@ -19,6 +19,7 @@ import { useT } from '@gitroom/react/translation/get.transation.service.client';
 import clsx from 'clsx';
 import copy from 'copy-to-clipboard';
 import { capitalize } from 'lodash';
+import { getPlatformIcon } from '@gitroom/frontend/components/helpers/platform-icon';
 const resolver = classValidatorResolver(ApiKeyDto);
 
 export const useAddProvider = (update?: () => void, invite?: boolean) => {
@@ -695,24 +696,15 @@ export const AddProviderComponent: FC<{
                 )}
               >
                 <div>
-                  {item.identifier === 'youtube' ? (
-                    <img src={`/icons/platforms/youtube.svg`} />
-                  ) : (
-                    <img
-                      className={clsx(
-                        'w-[32px] h-[32px]',
-                        item.identifier !== 'google_my_business' &&
-                          'rounded-full'
-                      )}
-                      src={`/icons/platforms/${
-                        ['facebook-ads', 'facebook-messages'].includes(
-                          item.identifier
-                        )
-                          ? 'facebook'
-                          : item.identifier
-                      }.png`}
-                    />
-                  )}
+                  <img
+                    className={clsx(
+                      'w-[32px] h-[32px]',
+                      item.identifier !== 'google_my_business' &&
+                        'rounded-full'
+                    )}
+                    src={getPlatformIcon(item.identifier)}
+                    alt={item.name}
+                  />
                 </div>
                 <div
                   className={clsx(

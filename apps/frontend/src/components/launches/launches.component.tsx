@@ -26,6 +26,7 @@ import { useT } from '@gitroom/react/translation/get.transation.service.client';
 import { useIntegrationList } from '@gitroom/frontend/components/launches/helpers/use.integration.list';
 import useCookie from 'react-use-cookie';
 import { Onboarding } from '@gitroom/frontend/components/onboarding/onboarding';
+import { getPlatformIcon } from '@gitroom/frontend/components/helpers/platform-icon';
 
 export const SVGLine = () => {
   return (
@@ -296,27 +297,13 @@ export const MenuComponent: FC<
           width={36}
           height={36}
         />
-        {integration.identifier === 'youtube' ? (
-          <img
-            src="/icons/platforms/youtube.svg"
-            className="absolute z-10 bottom-[5px] -end-[5px]"
-            width={20}
-          />
-        ) : (
-          <SafeImage
-            src={`/icons/platforms/${
-              ['facebook-ads', 'facebook-messages'].includes(
-                integration.identifier
-              )
-                ? 'facebook'
-                : integration.identifier
-            }.png`}
-            className="rounded-[8px] absolute z-10 bottom-[5px] -end-[5px] border border-fifth"
-            alt={integration.identifier}
-            width={18.41}
-            height={18.41}
-          />
-        )}
+        <SafeImage
+          src={getPlatformIcon(integration.identifier)}
+          className="rounded-[8px] absolute z-10 bottom-[5px] -end-[5px] border border-fifth"
+          alt={integration.identifier}
+          width={18.41}
+          height={18.41}
+        />
       </div>
       <div
         // @ts-ignore

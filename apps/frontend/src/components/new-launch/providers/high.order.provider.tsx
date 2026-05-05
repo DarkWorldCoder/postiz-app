@@ -22,6 +22,7 @@ import { InternalChannels } from '@gitroom/frontend/components/launches/internal
 import { createPortal } from 'react-dom';
 import clsx from 'clsx';
 import SafeImage from '@gitroom/react/helpers/safe.image';
+import { getPlatformIcon } from '@gitroom/frontend/components/helpers/platform-icon';
 
 class Empty {
   @IsOptional()
@@ -327,7 +328,9 @@ export const withProvider = function <T extends object>(params: {
                           width={16}
                           height={16}
                           className="rounded-[16px] min-w-[16px] min-h-[16px] w-[16px] h-[16px] absolute bottom-0 end-0"
-                          src={`/icons/platforms/${selectedIntegration?.integration.identifier}.png`}
+                          src={getPlatformIcon(
+                            selectedIntegration?.integration.identifier
+                          )}
                         />
                       </div>
                       <div className="text-[20px]">{selectedIntegration?.integration.name}</div>

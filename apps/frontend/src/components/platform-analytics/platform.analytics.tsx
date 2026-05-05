@@ -18,6 +18,7 @@ import { useVariables } from '@gitroom/react/helpers/variable.context';
 import useCookie from 'react-use-cookie';
 import { SVGLine } from '@gitroom/frontend/components/launches/launches.component';
 import { LoadingComponent } from '@gitroom/frontend/components/layout/loading';
+import { getPlatformIcon } from '@gitroom/frontend/components/helpers/platform-icon';
 const allowedIntegrations = [
   'facebook',
   'facebook-ads',
@@ -274,13 +275,7 @@ export const PlatformAnalytics = () => {
                   <SVGLine />
                 </div>
                 <ImageWithFallback
-                  fallbackSrc={`/icons/platforms/${
-                    ['facebook-ads', 'facebook-messages'].includes(
-                      integration.identifier
-                    )
-                      ? 'facebook'
-                      : integration.identifier
-                  }.png`}
+                  fallbackSrc={getPlatformIcon(integration.identifier)}
                   src={integration.picture}
                   className="rounded-[8px]"
                   alt={integration.identifier}
@@ -288,13 +283,7 @@ export const PlatformAnalytics = () => {
                   height={36}
                 />
                 <SafeImage
-                  src={`/icons/platforms/${
-                    ['facebook-ads', 'facebook-messages'].includes(
-                      integration.identifier
-                    )
-                      ? 'facebook'
-                      : integration.identifier
-                  }.png`}
+                  src={getPlatformIcon(integration.identifier)}
                   className="rounded-[8px] absolute z-10 bottom-[5px] -end-[5px] border border-fifth"
                   alt={integration.identifier}
                   width={18.41}

@@ -721,6 +721,58 @@ export class MetaFeaturesService {
               await this.ingestLeadByExternalId(integration.id, change.value.leadgen_id);
             }
           }
+
+          if (
+            body.object === 'whatsapp_business_account' &&
+            change.field === 'messages' &&
+            change.value?.messages?.length
+          ) {
+            const phoneNumberId = change.value?.metadata?.phone_number_id;
+            if (!phoneNumberId) {
+              continue;
+            }
+
+            const integrations = await this._integration.model.integration.findMany({
+              where: {
+                internalId: String(phoneNumberId),
+                providerIdentifier: 'whatsapp',
+                deletedAt: null,
+                inBetweenSteps: false,
+              },
+            });
+            const contacts = change.value?.contacts || [];
+
+            for (const message of change.value.messages || []) {
+              const contact = contacts.find(
+                (item: any) => String(item.wa_id) === String(message.from)
+              );
+              const timestamp = message.timestamp
+                ? Number(message.timestamp) * 1000
+                : Date.now();
+              const content = this.whatsAppMessageContent(message);
+
+              for (const integration of integrations) {
+                await this.upsertInboxWebhookMessage(
+                  integration,
+                  {
+                    id: message.id,
+                    sender: {
+                      id: message.from,
+                      name: contact?.profile?.name,
+                    },
+                    profile: contact?.profile,
+                    message: {
+                      mid: message.id,
+                      text: content,
+                    },
+                    timestamp,
+                    whatsapp: message,
+                  },
+                  body.object
+                );
+              }
+            }
+          }
         }
 
         for (const messaging of entry.messaging || []) {
@@ -793,5 +845,19 @@ export class MetaFeaturesService {
       lastMessageAt: sentAt,
       unreadIncrement: true,
     });
+  }
+
+  private whatsAppMessageContent(message: any) {
+    return (
+      message.text?.body ||
+      message.button?.text ||
+      message.interactive?.button_reply?.title ||
+      message.interactive?.list_reply?.title ||
+      message.image?.caption ||
+      message.video?.caption ||
+      message.document?.caption ||
+      message.type ||
+      ''
+    );
   }
 }

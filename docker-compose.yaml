@@ -11,6 +11,8 @@ services:
     restart: always
     env_file:
       - .env
+    environment:
+      BACKEND_INTERNAL_URL: "http://localhost:3000"
 
     volumes:
       - postiz-config:/config/

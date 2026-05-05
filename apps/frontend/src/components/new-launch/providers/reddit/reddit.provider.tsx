@@ -16,6 +16,7 @@ import {
 } from '@gitroom/nestjs-libraries/dtos/posts/providers-settings/reddit.dto';
 import clsx from 'clsx';
 import { useMediaDirectory } from '@gitroom/react/helpers/use.media.directory';
+import { getPlatformIcon } from '@gitroom/frontend/components/helpers/platform-icon';
 import { deleteDialog } from '@gitroom/react/helpers/delete.dialog';
 import SafeImage from '@gitroom/react/helpers/safe.image';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
@@ -129,7 +130,7 @@ const RedditPreview: FC = (props) => {
                       <SafeImage
                         width={24}
                         height={24}
-                        src={`/icons/platforms/${integration?.identifier!}.png`}
+                        src={getPlatformIcon(integration?.identifier)}
                         alt="x"
                         className="rounded-full absolute -end-[5px] -bottom-[5px] z-[2]"
                       />

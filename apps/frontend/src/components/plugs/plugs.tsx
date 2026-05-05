@@ -17,6 +17,7 @@ import { useT } from '@gitroom/react/translation/get.transation.service.client';
 import useCookie from 'react-use-cookie';
 import { SVGLine } from '@gitroom/frontend/components/launches/launches.component';
 import { LoadingComponent } from '@gitroom/frontend/components/layout/loading';
+import { getPlatformIcon } from '@gitroom/frontend/components/helpers/platform-icon';
 export const Plugs = () => {
   const fetch = useFetch();
   const router = useRouter();
@@ -193,7 +194,7 @@ export const Plugs = () => {
                   <SVGLine />
                 </div>
                 <ImageWithFallback
-                  fallbackSrc={`/icons/platforms/${integration.identifier}.png`}
+                  fallbackSrc={getPlatformIcon(integration.identifier)}
                   src={integration.picture}
                   className="rounded-[8px]"
                   alt={integration.identifier}
@@ -201,7 +202,7 @@ export const Plugs = () => {
                   height={36}
                 />
                 <SafeImage
-                  src={`/icons/platforms/${integration.identifier}.png`}
+                  src={getPlatformIcon(integration.identifier)}
                   className="rounded-[8px] absolute z-10 bottom-[5px] -end-[5px] border border-fifth"
                   alt={integration.identifier}
                   width={18.41}

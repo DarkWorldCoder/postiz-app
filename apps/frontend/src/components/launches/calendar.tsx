@@ -53,6 +53,7 @@ import i18next from 'i18next';
 import { AddEditModal } from '@gitroom/frontend/components/new-launch/add.edit.modal';
 import { deleteDialog } from '@gitroom/react/helpers/delete.dialog';
 import { useVariables } from '@gitroom/react/helpers/variable.context';
+import { getPlatformIcon } from '@gitroom/frontend/components/helpers/platform-icon';
 import copy from 'copy-to-clipboard';
 import { stripHtmlValidation } from '@gitroom/helpers/utils/strip.html.validation';
 import { newDayjs } from '@gitroom/frontend/components/layout/set.timezone';
@@ -942,27 +943,13 @@ export const CalendarColumn: FC<{
                           width={32}
                           height={32}
                         />
-                        {selectedIntegrations.identifier === 'youtube' ? (
-                          <img
-                            src="/icons/platforms/youtube.svg"
-                            className="absolute z-10 -bottom-[5px] -end-[5px]"
-                            width={20}
-                          />
-                        ) : (
-                          <SafeImage
-                            src={`/icons/platforms/${
-                              ['facebook-ads', 'facebook-messages'].includes(
-                                selectedIntegrations.identifier
-                              )
-                                ? 'facebook'
-                                : selectedIntegrations.identifier
-                            }.png`}
-                            className="rounded-[8px] absolute z-10 -bottom-[5px] -end-[5px] border border-fifth"
-                            alt={selectedIntegrations.identifier}
-                            width={20}
-                            height={20}
-                          />
-                        )}
+                        <SafeImage
+                          src={getPlatformIcon(selectedIntegrations.identifier)}
+                          className="rounded-[8px] absolute z-10 -bottom-[5px] -end-[5px] border border-fifth"
+                          alt={selectedIntegrations.identifier}
+                          width={20}
+                          height={20}
+                        />
                       </div>
                     </div>
                   ))}
@@ -1145,7 +1132,8 @@ const CalendarItem: FC<{
           />
           <img
             className="w-[12px] h-[12px] rounded-[8px] absolute z-10 top-[10px] end-0 border border-fifth"
-            src={`/icons/platforms/${post.integration?.providerIdentifier}.png`}
+            src={getPlatformIcon(post.integration?.providerIdentifier)}
+            alt={post.integration?.providerIdentifier || ''}
           />
         </div>
         <div className="w-full flex-1 flex flex-col min-h-[40px]">

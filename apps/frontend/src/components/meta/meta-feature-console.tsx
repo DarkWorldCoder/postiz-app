@@ -11,13 +11,13 @@ import { useToaster } from '@gitroom/react/toaster/toaster';
 type Feature = 'comments' | 'ads' | 'leads' | 'commerce' | 'audiences' | 'suggestions' | 'subscriptions';
 
 const titleMap: Record<Feature, string> = {
-  comments: 'Comments',
-  ads: 'Ads Manager',
-  leads: 'Lead Ads',
-  commerce: 'Commerce',
-  audiences: 'Audiences',
-  suggestions: 'Content Suggestions',
-  subscriptions: 'Subscriptions',
+  comments: 'ProERP Comments',
+  ads: 'ProERP Ads',
+  leads: 'ProERP Leads',
+  commerce: 'ProERP Commerce',
+  audiences: 'ProERP Audiences',
+  suggestions: 'ProERP Ideas',
+  subscriptions: 'ProERP Subscriptions',
 };
 
 const providerAllowList = [
@@ -37,6 +37,7 @@ export const MetaFeatureConsole: FC<{ feature: Feature }> = ({ feature }) => {
   const toaster = useToaster();
   const [integrationId, setIntegrationId] = useState('');
   const [busy, setBusy] = useState(false);
+  const [actionResult, setActionResult] = useState<any>(null);
   const [form, setForm] = useState<Record<string, any>>({
     status: 'PAUSED',
     objective: 'OUTCOME_TRAFFIC',
@@ -44,7 +45,10 @@ export const MetaFeatureConsole: FC<{ feature: Feature }> = ({ feature }) => {
   });
 
   const load = useCallback(async (url: string) => (await fetch(url)).json(), []);
-  const { data: integrationsData, isLoading } = useSWR('/integrations/list', load);
+  const { data: integrationsData, isLoading } = useSWR('/integrations/list', load, {
+    refreshInterval: 15000,
+    revalidateOnFocus: true,
+  });
 
   const integrations = useMemo(() => {
     const list = integrationsData?.integrations || integrationsData || [];
@@ -67,7 +71,8 @@ export const MetaFeatureConsole: FC<{ feature: Feature }> = ({ feature }) => {
   }, [feature, selectedId]);
 
   const { data, isLoading: dataLoading } = useSWR(dataKey, load, {
-    revalidateOnFocus: false,
+    refreshInterval: feature === 'comments' || feature === 'leads' ? 10000 : 30000,
+    revalidateOnFocus: true,
   });
 
   const run = useCallback(
@@ -84,7 +89,9 @@ export const MetaFeatureConsole: FC<{ feature: Feature }> = ({ feature }) => {
         if (!response.ok) throw new Error(await response.text());
         toaster.show(success, 'success');
         if (dataKey) await mutate(dataKey);
-        return response.json().catch(() => ({}));
+        const result = await response.json().catch(() => ({}));
+        setActionResult(result);
+        return result;
       } catch (err: any) {
         toaster.show(err?.message || 'Request failed', 'warning');
       } finally {
@@ -104,8 +111,11 @@ export const MetaFeatureConsole: FC<{ feature: Feature }> = ({ feature }) => {
 
   return (
     <div className="bg-newBgColorInner flex-1 p-[20px] overflow-y-auto">
-      <div className="flex items-center justify-between gap-[16px] mb-[18px]">
-        <h1 className="text-[24px] font-[600]">{titleMap[feature]}</h1>
+      <div className="mb-[18px] flex flex-wrap items-start justify-between gap-[16px] border-b border-blockSeparator pb-[18px]">
+        <div>
+          <div className="text-[12px] font-[600] uppercase text-textItemBlur">ProERP workspace</div>
+          <h1 className="mt-[4px] text-[24px] font-[600]">{titleMap[feature]}</h1>
+        </div>
         <div className="w-[280px]">
           <Select
             label=""
@@ -125,7 +135,7 @@ export const MetaFeatureConsole: FC<{ feature: Feature }> = ({ feature }) => {
       </div>
 
       {!selectedId ? (
-        <div className="text-textItemBlur">Connect a supported Meta channel first.</div>
+        <EmptyPanel title="No connected channel" text="Connect Facebook, Instagram, WhatsApp, or TikTok Business to load ProERP data here." />
       ) : feature === 'comments' ? (
         <CommentsPanel
           data={data}
@@ -147,7 +157,7 @@ export const MetaFeatureConsole: FC<{ feature: Feature }> = ({ feature }) => {
       ) : feature === 'subscriptions' ? (
         <SubscriptionsPanel data={data} loading={dataLoading} busy={busy} form={form} setForm={setForm} run={run} integrationId={selectedId} />
       ) : (
-        <SuggestionsPanel busy={busy} form={form} setForm={setForm} run={run} integrationId={selectedId} />
+        <SuggestionsPanel busy={busy} form={form} setForm={setForm} run={run} integrationId={selectedId} result={actionResult} />
       )}
     </div>
   );
@@ -198,8 +208,42 @@ const parseJsonInput = (value?: string) => {
   }
 };
 
+const EmptyPanel = ({ title, text }: { title: string; text: string }) => (
+  <div className="rounded-[8px] border border-dashed border-newTableBorder bg-newTableHeader p-[28px] text-center">
+    <div className="text-[18px] font-[600]">{title}</div>
+    <div className="mx-auto mt-[8px] max-w-[520px] text-[13px] leading-[20px] text-textItemBlur">
+      {text}
+    </div>
+  </div>
+);
+
+const Section = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) => (
+  <section className="mb-[16px] rounded-[8px] border border-newTableBorder bg-newTableHeader p-[16px]">
+    <div className="mb-[12px] text-[15px] font-[600]">{title}</div>
+    <div className="flex flex-wrap items-end gap-[10px]">{children}</div>
+  </section>
+);
+
+const ResultPanel = ({ value }: { value: any }) => {
+  if (!value || (typeof value === 'object' && !Object.keys(value).length)) {
+    return null;
+  }
+
+  return (
+    <pre className="mt-[16px] max-h-[360px] overflow-auto rounded-[8px] border border-newTableBorder bg-newBgLineColor p-[14px] text-[12px] leading-[18px] whitespace-pre-wrap">
+      {JSON.stringify(value, null, 2)}
+    </pre>
+  );
+};
+
 const Toolbar = ({ children }: { children: ReactNode }) => (
-  <div className="flex flex-wrap gap-[10px] items-end bg-newTableHeader border border-newTableBorder rounded-[8px] p-[14px] mb-[16px]">
+  <div className="mb-[16px] flex flex-wrap items-end gap-[10px] rounded-[8px] border border-newTableBorder bg-newTableHeader p-[14px]">
     {children}
   </div>
 );
@@ -234,7 +278,9 @@ const CommentsPanel = ({ data, loading, busy, form, setForm, run, integrationId 
         Save Rule
       </Button>
     </Toolbar>
-    {loading ? <LoadingComponent /> : (
+    {loading ? <LoadingComponent /> : !(data?.comments || []).length ? (
+      <EmptyPanel title="No comments loaded" text="Sync a post to bring comments into ProERP moderation." />
+    ) : (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-[12px]">
         {(data?.comments || []).map((comment: any) => (
           <div key={comment.id} className="border border-newTableBorder rounded-[8px] p-[14px] bg-newTableHeader">
@@ -266,7 +312,7 @@ const CommentsPanel = ({ data, loading, busy, form, setForm, run, integrationId 
 
 const AdsPanel = ({ data, loading, busy, form, setForm, run, integrationId }: any) => (
   <>
-    <Toolbar>
+    <Section title="Campaign controls">
       <Button loading={busy} onClick={() => run(`/ads/${integrationId}/campaigns/sync`, { method: 'POST' }, 'Campaigns synced')}>Sync</Button>
       <Field label="Name" value={form.name} onChange={(value) => setForm({ ...form, name: value })} />
       <Field label="Objective" value={form.objective} onChange={(value) => setForm({ ...form, objective: value })} />
@@ -280,8 +326,10 @@ const AdsPanel = ({ data, loading, busy, form, setForm, run, integrationId }: an
       >
         Create Campaign
       </Button>
-    </Toolbar>
-    {loading ? <LoadingComponent /> : (
+    </Section>
+    {loading ? <LoadingComponent /> : !(data || []).length ? (
+      <EmptyPanel title="No campaigns loaded" text="Sync campaigns or create a paused draft campaign to start managing ProERP ads." />
+    ) : (
       <div className="flex flex-col gap-[10px]">
         {(data || []).map((campaign: any) => (
           <div key={campaign.id} className="border border-newTableBorder rounded-[8px] p-[14px] bg-newTableHeader">
@@ -296,11 +344,13 @@ const AdsPanel = ({ data, loading, busy, form, setForm, run, integrationId }: an
 
 const LeadsPanel = ({ data, loading, busy, run, integrationId }: any) => (
   <>
-    <Toolbar>
+    <Section title="Lead operations">
       <Button loading={busy} onClick={() => run(`/leads/${integrationId}/forms/sync`, { method: 'POST' }, 'Lead forms synced')}>Sync Forms</Button>
       <Button onClick={() => window.open('/api/leads/export.csv', '_blank')}>Export CSV</Button>
-    </Toolbar>
-    {loading ? <LoadingComponent /> : (
+    </Section>
+    {loading ? <LoadingComponent /> : !(data || []).length ? (
+      <EmptyPanel title="No leads yet" text="Sync forms and wait for Meta lead webhook data to load into ProERP." />
+    ) : (
       <div className="flex flex-col gap-[10px]">
         {(data || []).map((lead: any) => (
           <div key={lead.id} className="border border-newTableBorder rounded-[8px] p-[14px] bg-newTableHeader">
@@ -316,12 +366,12 @@ const LeadsPanel = ({ data, loading, busy, run, integrationId }: any) => (
 
 const CommercePanel = ({ busy, form, setForm, run, integrationId }: any) => (
   <>
-    <Toolbar>
+    <Section title="Catalog sync">
       <Button loading={busy} onClick={() => run(`/commerce/${integrationId}/catalogs/sync`, { method: 'POST' }, 'Catalogs synced')}>Sync Catalogs</Button>
       <Field label="Catalog ID" value={form.catalogId} onChange={(value) => setForm({ ...form, catalogId: value })} />
       <Button loading={busy} onClick={() => run(`/commerce/${integrationId}/catalogs/${form.catalogId}/products/sync`, { method: 'POST' }, 'Products synced')}>Sync Products</Button>
-    </Toolbar>
-    <Toolbar>
+    </Section>
+    <Section title="Product draft">
       <Field label="Name" value={form.productName} onChange={(value) => setForm({ ...form, productName: value })} />
       <Field label="Retailer ID" value={form.retailerId} onChange={(value) => setForm({ ...form, retailerId: value })} />
       <Field label="Price" value={form.price} onChange={(value) => setForm({ ...form, price: value })} />
@@ -334,7 +384,7 @@ const CommercePanel = ({ busy, form, setForm, run, integrationId }: any) => (
       >
         Create Product
       </Button>
-    </Toolbar>
+    </Section>
   </>
 );
 
@@ -353,7 +403,9 @@ const AudiencesPanel = ({ data, loading, busy, form, setForm, run, integrationId
         Create Audience
       </Button>
     </Toolbar>
-    {loading ? <LoadingComponent /> : (
+    {loading ? <LoadingComponent /> : !(data || []).length ? (
+      <EmptyPanel title="No audiences loaded" text="Create a ProERP audience or sync connected business audience data." />
+    ) : (
       <div className="flex flex-col gap-[10px]">
         {(data || []).map((audience: any) => (
           <div key={audience.id} className="border border-newTableBorder rounded-[8px] p-[14px] bg-newTableHeader">
@@ -366,19 +418,20 @@ const AudiencesPanel = ({ data, loading, busy, form, setForm, run, integrationId
   </>
 );
 
-const SuggestionsPanel = ({ busy, form, setForm, run, integrationId }: any) => (
+const SuggestionsPanel = ({ busy, form, setForm, run, integrationId, result }: any) => (
   <>
-    <Toolbar>
+    <Section title="Channel intelligence">
       <Button loading={busy} onClick={() => run(`/content-suggestions/${integrationId}/best-times`, {}, 'Best times loaded')}>Best Times</Button>
       <Button loading={busy} onClick={() => run(`/content-suggestions/${integrationId}/content-ideas`, {}, 'Ideas loaded')}>Content Ideas</Button>
       <Button loading={busy} onClick={() => run(`/content-suggestions/${integrationId}/trending-audio`, {}, 'Audio loaded')}>Trending Audio</Button>
-    </Toolbar>
-    <Toolbar>
+    </Section>
+    <Section title="Content helper">
       <JsonField label="Post content" value={form.content} onChange={(value) => setForm({ ...form, content: value })} />
       <Button loading={busy} onClick={() => run('/content-suggestions/hashtags', { method: 'POST', body: JSON.stringify({ content: form.content }) }, 'Hashtags generated')}>
         Hashtags
       </Button>
-    </Toolbar>
+    </Section>
+    <ResultPanel value={result} />
   </>
 );
 

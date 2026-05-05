@@ -8,6 +8,7 @@ import { Button } from '@gitroom/react/form/button';
 import { useIntegrationList } from '@gitroom/frontend/components/launches/helpers/use.integration.list';
 import { useSWRConfig } from 'swr';
 import clsx from 'clsx';
+import { getPlatformIcon } from '@gitroom/frontend/components/helpers/platform-icon';
 
 interface DebugPostData {
   type: string;
@@ -230,7 +231,7 @@ export const ImportDebugPostModal: FC<{ close: () => void }> = ({ close }) => {
                       {integration.name}
                     </div>
                     <img
-                      src={`/icons/platforms/${integration.identifier}.png`}
+                      src={getPlatformIcon(integration.identifier)}
                       className="w-[14px] h-[14px] rounded-[4px] ml-auto"
                       alt={integration.identifier}
                     />

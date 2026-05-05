@@ -11,6 +11,7 @@ import clsx from 'clsx';
 import dayjs from 'dayjs';
 import useSWR, { mutate } from 'swr';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { getPlatformIcon } from '@gitroom/frontend/components/helpers/platform-icon';
 
 interface InboxIntegration {
   id: string;
@@ -22,6 +23,7 @@ interface InboxIntegration {
 
 type InboxChannel = 'FACEBOOK' | 'INSTAGRAM' | 'WHATSAPP' | 'TIKTOK';
 type InboxFilter = 'ALL' | InboxChannel;
+const LIVE_REFRESH_INTERVAL = 3000;
 
 interface InboxConversation {
   id: string;
@@ -57,9 +59,10 @@ const channelLabel = (channel: InboxFilter) => {
 };
 
 const channelIcon = (channel?: InboxChannel) => {
-  if (channel === 'INSTAGRAM') return '/icons/platforms/instagram.png';
-  if (channel === 'TIKTOK') return '/icons/platforms/tiktok.png';
-  return '/icons/platforms/facebook.png';
+  if (channel === 'INSTAGRAM') return getPlatformIcon('instagram-messages');
+  if (channel === 'WHATSAPP') return getPlatformIcon('whatsapp');
+  if (channel === 'TIKTOK') return getPlatformIcon('tiktok-business');
+  return getPlatformIcon('facebook-messages');
 };
 
 export const SocialInboxComponent = () => {
@@ -81,7 +84,8 @@ export const SocialInboxComponent = () => {
     '/inbox/integrations',
     load,
     {
-      revalidateOnFocus: false,
+      refreshInterval: LIVE_REFRESH_INTERVAL,
+      revalidateOnFocus: true,
       revalidateOnReconnect: false,
       revalidateIfStale: false,
       refreshWhenHidden: false,
@@ -107,7 +111,8 @@ export const SocialInboxComponent = () => {
     conversationsKey,
     load,
     {
-      revalidateOnFocus: false,
+      refreshInterval: LIVE_REFRESH_INTERVAL,
+      revalidateOnFocus: true,
       revalidateOnReconnect: false,
       revalidateIfStale: false,
       refreshWhenHidden: false,
@@ -133,7 +138,8 @@ export const SocialInboxComponent = () => {
     messagesKey,
     load,
     {
-      revalidateOnFocus: false,
+      refreshInterval: LIVE_REFRESH_INTERVAL,
+      revalidateOnFocus: true,
       revalidateOnReconnect: false,
       revalidateIfStale: false,
       refreshWhenHidden: false,
@@ -216,20 +222,32 @@ export const SocialInboxComponent = () => {
   const currentConversation = (conversations || []).find(
     (conversation: InboxConversation) => conversation.id === currentConversationId
   );
+  const filteredIntegrations = (integrations as InboxIntegration[]).filter(
+    (integration) => {
+      if (channelFilter === 'ALL') return true;
+      return channelForProvider(integration.providerIdentifier) === channelFilter;
+    }
+  );
 
   return (
     <>
-      <div className="bg-newBgColorInner p-[20px] flex flex-col gap-[15px] w-[260px]">
+      <div className="bg-newBgColorInner p-[20px] flex flex-col gap-[15px] w-[280px] min-h-0">
         <div className="flex items-center justify-between">
-          <h2 className="text-[20px] font-[500]">
-            {t('channels', 'Channels')}
-          </h2>
+          <div>
+            <h2 className="text-[20px] font-[500]">
+              {t('channels', 'Channels')}
+            </h2>
+            <div className="mt-[4px] flex items-center gap-[6px] text-[12px] text-textItemBlur">
+              <span className="h-[7px] w-[7px] rounded-full bg-green-500" />
+              {t('live', 'Live')}
+            </div>
+          </div>
           <Button onClick={sync} loading={syncing}>
             {t('sync', 'Sync')}
           </Button>
         </div>
         
-        <div className="flex gap-[10px] text-[13px] border-b border-blockSeparator pb-[10px]">
+        <div className="flex flex-wrap gap-[8px] text-[13px] border-b border-blockSeparator pb-[10px]">
           {(['ALL', 'FACEBOOK', 'INSTAGRAM', 'WHATSAPP', 'TIKTOK'] as InboxFilter[]).map((filter) => (
             <button
               key={filter}
@@ -246,13 +264,8 @@ export const SocialInboxComponent = () => {
           ))}
         </div>
 
-        <div className="flex flex-col gap-[10px]">
-          {(integrations as InboxIntegration[])
-            .filter((integration) => {
-              if (channelFilter === 'ALL') return true;
-              return channelForProvider(integration.providerIdentifier) === channelFilter;
-            })
-            .map((integration) => {
+        <div className="flex min-h-0 flex-col gap-[10px] overflow-y-auto">
+          {filteredIntegrations.map((integration) => {
             const channel = channelForProvider(integration.providerIdentifier);
             return (
             <button
@@ -287,17 +300,27 @@ export const SocialInboxComponent = () => {
               <div className="min-w-0">
                 <div className="font-[500] truncate">{integration.name}</div>
                 <div className="text-[12px] text-textItemBlur truncate">
-                  {channelLabel(channel)} Inbox
+                  ProERP {channelLabel(channel)} Inbox
                 </div>
               </div>
             </button>
           )})}
+          {!filteredIntegrations.length && (
+            <div className="rounded-[10px] border border-dashed border-newTableBorder p-[14px] text-[13px] text-textItemBlur">
+              {t('no_channels_for_filter', 'No channels for this filter.')}
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="bg-newBgColorInner p-[20px] flex flex-col gap-[12px] w-[360px] border-l border-blockSeparator">
-        <div className="text-[20px] font-[500]">
-          {t('conversations', 'Conversations')}
+      <div className="bg-newBgColorInner p-[20px] flex min-h-0 flex-col gap-[12px] w-[380px] border-l border-blockSeparator">
+        <div>
+          <div className="text-[20px] font-[500]">
+            {t('conversations', 'Conversations')}
+          </div>
+          <div className="text-[12px] text-textItemBlur">
+            ProERP
+          </div>
         </div>
         {conversationsLoading ? (
           <div className="flex flex-1 items-center justify-center">
@@ -311,7 +334,7 @@ export const SocialInboxComponent = () => {
             )}
           </div>
         ) : (
-          <div className="flex flex-col gap-[10px] overflow-y-auto">
+          <div className="flex min-h-0 flex-col gap-[10px] overflow-y-auto">
             {(conversations as InboxConversation[]).map((conversation) => (
               <button
                 key={conversation.id}
@@ -349,7 +372,7 @@ export const SocialInboxComponent = () => {
         )}
       </div>
 
-      <div className="flex-1 bg-newBgColorInner p-[20px] flex flex-col gap-[14px] border-l border-blockSeparator">
+      <div className="flex-1 bg-newBgColorInner p-[20px] flex min-h-0 flex-col gap-[14px] border-l border-blockSeparator">
         <div className="flex items-center justify-between">
           <div>
             <div className="text-[20px] font-[500]">
@@ -360,6 +383,11 @@ export const SocialInboxComponent = () => {
               {currentConversation?.participantId || ''}
             </div>
           </div>
+          {!!currentConversationId && (
+            <div className="rounded-full bg-newBgLineColor px-[10px] py-[5px] text-[12px] text-textItemBlur">
+              {t('live', 'Live')}
+            </div>
+          )}
         </div>
 
         {!currentConversationId ? (
@@ -375,7 +403,7 @@ export const SocialInboxComponent = () => {
           </div>
         ) : (
           <>
-            <div className="flex-1 overflow-y-auto flex flex-col gap-[10px]">
+            <div className="flex-1 overflow-y-auto flex flex-col gap-[10px] pe-[4px]">
               {(messages as InboxMessage[])?.map((message) => (
                 <div
                   key={message.id}

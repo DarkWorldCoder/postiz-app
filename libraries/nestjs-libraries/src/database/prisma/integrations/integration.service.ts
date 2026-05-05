@@ -290,6 +290,14 @@ export class IntegrationService {
       throw new HttpException('Integration not found', HttpStatus.NOT_FOUND);
     }
     if (!getIntegration.inBetweenSteps) {
+      const selectedPageId = data?.page || data?.id;
+      if (
+        selectedPageId &&
+        String(selectedPageId) === String(getIntegration.internalId)
+      ) {
+        return { success: true };
+      }
+
       throw new HttpException('Invalid request', HttpStatus.BAD_REQUEST);
     }
 

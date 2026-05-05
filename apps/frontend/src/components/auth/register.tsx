@@ -219,7 +219,7 @@ export function RegisterAfter({
                 )}
                 &nbsp;
                 <a
-                  href={`https://postiz.com/terms`}
+                  href="https://social.wiseadmit.io/terms-condition"
                   className="underline hover:font-bold"
                   rel="nofollow"
                 >
@@ -228,7 +228,7 @@ export function RegisterAfter({
                 &nbsp;
                 {t('and', 'and')}&nbsp;
                 <a
-                  href={`https://postiz.com/privacy`}
+                  href="https://social.wiseadmit.io/privacy-policy"
                   rel="nofollow"
                   className="underline hover:font-bold"
                 >

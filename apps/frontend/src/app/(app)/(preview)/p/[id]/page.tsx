@@ -12,6 +12,7 @@ import { VideoOrImage } from '@gitroom/react/helpers/video.or.image';
 import { CopyClient } from '@gitroom/frontend/components/preview/copy.client';
 import { getT } from '@gitroom/react/translation/get.translation.service.backend';
 import { RenderPreviewDateClient } from '@gitroom/frontend/components/preview/render.preview.date.client';
+import { getPlatformIcon } from '@gitroom/frontend/components/helpers/platform-icon';
 
 dayjs.extend(utc);
 export const metadata: Metadata = {
@@ -129,7 +130,9 @@ export default async function Auth(
                         <img
                           className="w-full h-full bg-black aspect-square rounded-full border-tableBorder"
                           alt={post[0].integration.providerIdentifier}
-                          src={`/icons/platforms/${post[0].integration.providerIdentifier}.png`}
+                          src={getPlatformIcon(
+                            post[0].integration.providerIdentifier
+                          )}
                         />
                       </div>
                     </div>
