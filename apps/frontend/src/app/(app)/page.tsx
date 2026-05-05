@@ -3,35 +3,35 @@ import { Metadata } from 'next';
 import { LegalShell, LegalSection, LegalList } from './legal-shell';
 
 export const metadata: Metadata = {
-  title: 'ProERP Social Media Management',
+  title: 'WiseSocial Social Media Management',
   description:
-    'ProERP by WiseAdmit helps teams connect social accounts, schedule content, publish posts, and review social performance.',
+    'WiseSocial by WiseAdmit helps teams connect social accounts, schedule content, publish posts, and review social performance.',
 };
 
 export default function ProerpOverviewPage() {
   return (
     <LegalShell
-      title="ProERP social media management"
-      description="ProERP is a WiseAdmit web application for managing connected social channels in one place. Teams use ProERP to connect Facebook, Instagram, TikTok, WhatsApp, and other supported accounts, prepare content, schedule posts, publish videos, review analytics, and manage social engagement workflows."
+      title="WiseSocial social media management"
+      description="WiseSocial is a WiseAdmit web application for managing connected social channels in one place. Teams use WiseSocial to connect Facebook, Instagram, TikTok, WhatsApp, and other supported accounts, prepare content, schedule posts, publish videos, review analytics, and manage social engagement workflows."
     >
       <div className="grid gap-[24px] lg:grid-cols-[1fr_320px]">
         <div>
-          <LegalSection title="What ProERP Does">
+          <LegalSection title="What WiseSocial Does">
             <LegalList
               items={[
                 'Connect authorized social accounts through official platform login and API flows.',
                 'Create, schedule, upload, and publish content to supported social channels when the user requests it.',
                 'Show account profile information, post history, public video lists, metrics, comments, messages, leads, ads, audiences, commerce data, and subscription-related social data where supported by the connected platform.',
-                'Give users controls to disconnect integrations, manage account settings, and request deletion of ProERP account or workspace data.',
+                'Give users controls to disconnect integrations, manage account settings, and request deletion of WiseSocial account or workspace data.',
               ]}
             />
           </LegalSection>
 
           <LegalSection title="App Features and Permissions">
             <p>
-              ProERP requests only the permissions needed for the connected
+              WiseSocial requests only the permissions needed for the connected
               features a user chooses to enable. The review-critical permissions
-              used by the ProERP social app are:
+              used by the WiseSocial social app are:
             </p>
             <div className="overflow-x-auto rounded-[8px] border border-[#d9dee8] bg-white">
               <table className="w-full min-w-[720px] border-collapse text-left text-[14px]">
@@ -44,7 +44,7 @@ export default function ProerpOverviewPage() {
                       Platform permissions or credentials
                     </th>
                     <th className="border-b border-[#d9dee8] p-[12px]">
-                      Why ProERP uses them
+                      Why WiseSocial uses them
                     </th>
                   </tr>
                 </thead>
@@ -91,7 +91,7 @@ export default function ProerpOverviewPage() {
                     </td>
                     <td className="border-b border-[#e5e7eb] p-[12px]">
                       Subscribe to webhook events, sync conversations, and allow
-                      authorized workspace users to reply from ProERP.
+                      authorized workspace users to reply from WiseSocial.
                     </td>
                   </tr>
                   <tr>
@@ -154,14 +154,14 @@ export default function ProerpOverviewPage() {
 
           <LegalSection title="Reviewer Information">
             <p>
-              ProERP is a web application hosted at{' '}
+              WiseSocial is a web application hosted at{' '}
               <span className="font-[700]">social.wiseadmit.io</span>. Demo
               videos for TikTok, Facebook, Instagram, and related platform
               reviews should show this same website and the exact product flows
               being requested for review.
             </p>
             <p>
-              ProERP is operated by WiseAdmit. ProERP is not affiliated with,
+              WiseSocial is operated by WiseAdmit. WiseSocial is not affiliated with,
               endorsed by, or sponsored by TikTok, Meta, Facebook, Instagram,
               WhatsApp, or any other third-party social platform.
             </p>
@@ -194,7 +194,7 @@ export default function ProerpOverviewPage() {
           </div>
           <p className="mt-[16px] text-[13px] leading-[1.6] text-[#64748b]">
             Contact WiseAdmit for privacy, security, or app review questions at
-            support@wiseadmit.io.
+            ayush@wiseadmit.io or info@wiseadmit.io.
           </p>
         </aside>
       </div>

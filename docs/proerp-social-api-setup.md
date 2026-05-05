@@ -1,4 +1,4 @@
-# ProERP Social API Setup
+# WiseSocial Social API Setup
 
 Use this checklist for `https://social.wiseadmit.io`. Keep all tokens in `.env` only.
 
@@ -7,7 +7,7 @@ Use this checklist for `https://social.wiseadmit.io`. Keep all tokens in `.env` 
 Use one public brand and one public domain across TikTok, Meta, demo videos, and the live web app.
 
 ```text
-App name: ProERP
+App name: WiseSocial
 Operator: WiseAdmit
 Website URL: https://social.wiseadmit.io/
 Terms of Service URL: https://social.wiseadmit.io/terms-condition
@@ -17,24 +17,24 @@ Data Deletion URL: https://social.wiseadmit.io/data-deletion
 
 The website URL must not redirect reviewers to a login page. The Privacy Policy and Terms of Service links must be visible on the website URL without opening a menu.
 
-For TikTok review, the demo video must show `https://social.wiseadmit.io/` and the end-to-end flow inside ProERP. Do not upload a demo from `wiseadmit.io`, `postiz.com`, localhost, or any other domain unless the submitted Website URL is changed to that same domain.
+For TikTok review, the demo video must show `https://social.wiseadmit.io/` and the end-to-end flow inside WiseSocial. Do not upload a demo from `wiseadmit.io`, `postiz.com`, localhost, or any other domain unless the submitted Website URL is changed to that same domain.
 
-## ProERP app features and required permissions
+## WiseSocial app features and required permissions
 
-Use this map when completing app review notes. Only request products, scopes, or credentials for features that are enabled and demonstrated in ProERP.
+Use this map when completing app review notes. Only request products, scopes, or credentials for features that are enabled and demonstrated in WiseSocial.
 
-| ProERP feature | Product or integration | Permissions, scopes, or credentials | Why ProERP needs it |
+| WiseSocial feature | Product or integration | Permissions, scopes, or credentials | Why WiseSocial needs it |
 | --- | --- | --- | --- |
 | Facebook Page publishing, comments, and insights | Meta Graph API | `pages_show_list`, `business_management`, `pages_manage_posts`, `pages_manage_engagement`, `pages_read_engagement`, `read_insights` | List authorized Pages, publish posts, manage engagement/comments, and show Page/post analytics. |
 | Instagram Business publishing, comments, insights, and commerce | Instagram Graph API through Meta | `instagram_basic`, `pages_show_list`, `pages_read_engagement`, `business_management`, `instagram_content_publish`, `instagram_manage_comments`, `instagram_manage_engagement`, `instagram_manage_insights`, `catalog_management` | Connect Instagram Business accounts, publish content, manage comments/engagement, show insights, and support catalog/product workflows. |
-| Facebook Inbox | Messenger Platform / Meta webhooks | `pages_show_list`, `business_management`, `pages_manage_metadata`, `pages_messaging`, `pages_read_engagement` | Subscribe to Page messaging events, sync conversations, and send authorized replies from ProERP. |
-| Instagram Inbox | Instagram Messaging / Meta webhooks | `instagram_basic`, `instagram_manage_messages`, `pages_show_list`, `pages_manage_metadata`, `business_management` | Sync Instagram conversations and send authorized replies from ProERP. |
+| Facebook Inbox | Messenger Platform / Meta webhooks | `pages_show_list`, `business_management`, `pages_manage_metadata`, `pages_messaging`, `pages_read_engagement` | Subscribe to Page messaging events, sync conversations, and send authorized replies from WiseSocial. |
+| Instagram Inbox | Instagram Messaging / Meta webhooks | `instagram_basic`, `instagram_manage_messages`, `pages_show_list`, `pages_manage_metadata`, `business_management` | Sync Instagram conversations and send authorized replies from WiseSocial. |
 | Facebook Ads | Marketing API | `business_management`, `ads_read`, `ads_management` | List ad accounts, show reports, create/update campaign workflows, and manage authorized ad assets. |
 | WhatsApp Business Inbox and messaging | WhatsApp Cloud API | `whatsapp_business_management`, `whatsapp_business_messaging`, Permanent Access Token, Phone Number ID, WhatsApp Business Account ID | Sync conversations, reply to users, manage templates, and send media, interactive, template, broadcast, and product messages. |
 | TikTok creator login, video listing, upload, and publishing | TikTok Login Kit and Content Posting API | `user.info.basic`, `user.info.profile`, `user.info.stats`, `video.list`, `video.upload`, `video.publish` | Connect TikTok accounts, display authorized profile/stats, list public videos, upload drafts, and publish videos after user confirmation. |
-| TikTok Business ads, leads, catalogs, audiences, subscriptions, comments, and reporting | TikTok API for Business | TikTok Business API Access Token, Advertiser ID, Business Account ID, optional ProERP messaging bridge URL/API key | Manage business reporting, ads, leads, business comments, catalogs, audiences, subscriptions, conversion events, identities, Spark Ads, and creative portfolio workflows. |
+| TikTok Business ads, leads, catalogs, audiences, subscriptions, comments, and reporting | TikTok API for Business | TikTok Business API Access Token, Advertiser ID, Business Account ID, optional WiseSocial messaging bridge URL/API key | Manage business reporting, ads, leads, business comments, catalogs, audiences, subscriptions, conversion events, identities, Spark Ads, and creative portfolio workflows. |
 
-Do not request TikTok Share Kit for ProERP unless a native mobile app using TikTok's mobile SDK is submitted separately.
+Do not request TikTok Share Kit for WiseSocial unless a native mobile app using TikTok's mobile SDK is submitted separately.
 
 ## Production environment
 
@@ -54,8 +54,8 @@ META_GRAPH_API_VERSION="v25.0"
 TIKTOK_CLIENT_ID=""
 TIKTOK_CLIENT_SECRET=""
 TIKTOK_BUSINESS_API_BASE="https://business-api.tiktok.com/open_api/v1.3"
-PROERP_TIKTOK_MESSAGING_BASE_URL=""
-PROERP_TIKTOK_MESSAGING_API_KEY=""
+WISESOCIAL_TIKTOK_MESSAGING_BASE_URL=""
+WISESOCIAL_TIKTOK_MESSAGING_API_KEY=""
 ```
 
 After changing env values on the server:
@@ -112,7 +112,7 @@ Business requirements:
 
 - Business verification completed.
 - App is in Live mode after testing.
-- Privacy Policy URL, Terms URL, and Data Deletion URL are configured with the ProERP URLs listed above.
+- Privacy Policy URL, Terms URL, and Data Deletion URL are configured with the WiseSocial URLs listed above.
 - Facebook Page is owned by or assigned to the Business.
 - Instagram account is Professional/Business and connected to the Facebook Page.
 - Ad account is assigned to the Business and to the connecting user.
@@ -171,7 +171,7 @@ In Meta Business settings:
 3. Create a System User.
 4. Assign the WhatsApp account and phone number to the System User.
 5. Generate a permanent token with `whatsapp_business_management` and `whatsapp_business_messaging`.
-6. In ProERP, add WhatsApp Business with:
+6. In WiseSocial, add WhatsApp Business with:
 
 ```text
 Permanent Access Token
@@ -190,9 +190,9 @@ Do not select Share Kit for this web app. TikTok Share Kit is for mobile SDK/sha
 Basic information:
 
 ```text
-App name: ProERP
+App name: WiseSocial
 Category: Business
-Description: Manage and publish social content in one place. ProERP helps teams create, schedule, upload, publish, and review posts.
+Description: Manage and publish social content in one place. WiseSocial helps teams create, schedule, upload, publish, and review posts.
 Website URL: https://social.wiseadmit.io/
 Terms of Service URL: https://social.wiseadmit.io/terms-condition
 Privacy Policy URL: https://social.wiseadmit.io/privacy-policy
@@ -226,13 +226,13 @@ user.info.stats
 Reviewer explanation:
 
 ```text
-This revision updates ProERP's public Website URL, Privacy Policy, and Terms of Service so they are hosted on the same domain as the ProERP web app: https://social.wiseadmit.io/. The Privacy Policy and Terms of Service now explicitly name ProERP and WiseAdmit and describe how ProERP uses TikTok data for login, account display, video listing, uploading, direct posting, analytics, security, retention, and deletion controls.
+This revision updates WiseSocial's public Website URL, Privacy Policy, and Terms of Service so they are hosted on the same domain as the WiseSocial web app: https://social.wiseadmit.io/. The Privacy Policy and Terms of Service now explicitly name WiseSocial and WiseAdmit and describe how WiseSocial uses TikTok data for login, account display, video listing, uploading, direct posting, analytics, security, retention, and deletion controls.
 
-Login Kit is used to let TikTok users authorize and connect their TikTok account to ProERP. ProERP uses user.info.basic to show the connected account identity, user.info.profile to show profile details authorized by the user, and user.info.stats to display account-level statistics inside ProERP.
+Login Kit is used to let TikTok users authorize and connect their TikTok account to WiseSocial. WiseSocial uses user.info.basic to show the connected account identity, user.info.profile to show profile details authorized by the user, and user.info.stats to display account-level statistics inside WiseSocial.
 
-Content Posting API is used only when the authorized user chooses to upload or publish TikTok content through ProERP. ProERP uses video.upload to upload content as a TikTok draft for creator review, video.publish to directly publish content after the user confirms the publishing settings, and video.list to display the user's public TikTok videos in ProERP.
+Content Posting API is used only when the authorized user chooses to upload or publish TikTok content through WiseSocial. WiseSocial uses video.upload to upload content as a TikTok draft for creator review, video.publish to directly publish content after the user confirms the publishing settings, and video.list to display the user's public TikTok videos in WiseSocial.
 
-Share Kit has been removed because ProERP is a web app and does not use the TikTok mobile SDK or mobile share sheet.
+Share Kit has been removed because WiseSocial is a web app and does not use the TikTok mobile SDK or mobile share sheet.
 ```
 
 Set:
@@ -246,7 +246,7 @@ TIKTOK_CLIENT_SECRET=""
 
 Create or connect a TikTok Business Center and Ads Manager account. Get an API for Business access token with Marketing API access.
 
-In ProERP, add TikTok Business with:
+In WiseSocial, add TikTok Business with:
 
 ```text
 Access Token
@@ -269,8 +269,8 @@ https://social.wiseadmit.io/api/webhooks/tiktok
 TikTok Business Messaging needs a messaging bridge:
 
 ```env
-PROERP_TIKTOK_MESSAGING_BASE_URL=""
-PROERP_TIKTOK_MESSAGING_API_KEY=""
+WISESOCIAL_TIKTOK_MESSAGING_BASE_URL=""
+WISESOCIAL_TIKTOK_MESSAGING_API_KEY=""
 ```
 
 Ads, audiences, subscriptions, and reporting can work with the TikTok Business API token. Inbox messaging will only work when the messaging bridge is configured.
@@ -286,7 +286,7 @@ Ads, audiences, subscriptions, and reporting can work with the TikTok Business A
 7. Add TikTok.
 8. Add TikTok Business.
 9. Send a Facebook message, Instagram message, WhatsApp message, test lead, and test ad sync.
-10. Check ProERP Inbox, Comments, Leads, Ads, Commerce, Audiences, Ideas, and Subscriptions pages.
+10. Check WiseSocial Inbox, Comments, Leads, Ads, Commerce, Audiences, Ideas, and Subscriptions pages.
 
 Official references:
 

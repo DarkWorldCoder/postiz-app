@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import { MetaFeatureConsole } from '@gitroom/frontend/components/meta/meta-feature-console';
 
 export const metadata: Metadata = {
-  title: 'ProERP Ads',
+  title: 'WiseSocial Ads',
   description: '',
 };
 

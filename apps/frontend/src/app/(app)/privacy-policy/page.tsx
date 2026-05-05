@@ -3,23 +3,23 @@ import { Metadata } from 'next';
 import { LegalShell, LegalSection, LegalList } from '../legal-shell';
 
 export const metadata: Metadata = {
-  title: 'ProERP Privacy Policy',
+  title: 'WiseSocial Privacy Policy',
   description:
-    'Privacy Policy for ProERP by WiseAdmit, including social media platform data use and deletion controls.',
+    'Privacy Policy for WiseSocial by WiseAdmit, including social media platform data use and deletion controls.',
 };
 
 export default function PrivacyPolicyPage() {
   return (
     <LegalShell
       title="Privacy Policy"
-      description="This Privacy Policy explains how WiseAdmit collects, uses, shares, retains, and protects information when you use ProERP, including information received from connected social platforms such as TikTok, Facebook, Instagram, and WhatsApp."
+      description="This Privacy Policy explains how WiseAdmit collects, uses, shares, retains, and protects information when you use WiseSocial, including information received from connected social platforms such as TikTok, Facebook, Instagram, and WhatsApp."
     >
       <LegalSection title="Effective Date">
         <p>Effective and last updated: May 5, 2026.</p>
         <p>
-          In this policy, "ProERP," "we," "us," and "our" mean the ProERP social
+          In this policy, "WiseSocial," "we," "us," and "our" mean the WiseSocial social
           media management service operated by WiseAdmit. "You" means the user,
-          customer, workspace member, or organization using ProERP.
+          customer, workspace member, or organization using WiseSocial.
         </p>
       </LegalSection>
 
@@ -31,25 +31,25 @@ export default function PrivacyPolicyPage() {
             'Content and publishing information, including drafts, captions, media files, thumbnails, links, scheduled dates, post settings, privacy selections, upload status, publishing status, public video or post lists, and related platform response data.',
             'Engagement and business workflow information, including comments, messages, message delivery status, leads, forms, ads, audiences, commerce catalog information, reporting metrics, insights, and subscriptions when supported by the connected platform and authorized by you.',
             'Technical and security information, including IP address, device and browser data, log records, error events, authentication events, API request metadata, cookies, and similar technologies.',
-            'Billing or transaction information if paid ProERP features are enabled, such as plan status, invoices, payment processor identifiers, and limited payment metadata. We do not store full payment card numbers when a third-party payment processor is used.',
+            'Billing or transaction information if paid WiseSocial features are enabled, such as plan status, invoices, payment processor identifiers, and limited payment metadata. We do not store full payment card numbers when a third-party payment processor is used.',
           ]}
         />
       </LegalSection>
 
       <LegalSection title="How We Use Information">
         <p>
-          ProERP uses social platform data only to provide requested features and
+          WiseSocial uses social platform data only to provide requested features and
           maintain the security and reliability of the service. We use
           information to:
         </p>
         <LegalList
           items={[
             'Authenticate users and allow them to connect, manage, and disconnect social accounts.',
-            'Display authorized profile, page, business, account, and workspace information inside ProERP.',
+            'Display authorized profile, page, business, account, and workspace information inside WiseSocial.',
             'Create, schedule, upload, publish, or direct-post content when you request those actions.',
             'Retrieve and list videos, posts, comments, messages, leads, ads, audiences, commerce data, subscriptions, and statistics that you are authorized to manage.',
             'Provide analytics, reports, previews, inbox views, moderation workflows, content planning, and account management tools.',
-            'Operate webhooks, troubleshoot failed posts, prevent abuse, monitor service health, maintain audit logs, and protect ProERP, users, and connected accounts.',
+            'Operate webhooks, troubleshoot failed posts, prevent abuse, monitor service health, maintain audit logs, and protect WiseSocial, users, and connected accounts.',
             'Respond to support, legal, privacy, security, and app review requests.',
           ]}
         />
@@ -58,7 +58,7 @@ export default function PrivacyPolicyPage() {
       <LegalSection title="TikTok, Facebook, Instagram, and WhatsApp Data">
         <p>
           When you connect TikTok, Facebook, Instagram, WhatsApp, or other social
-          channels, ProERP receives only the data and permissions you authorize
+          channels, WiseSocial receives only the data and permissions you authorize
           through the relevant platform. For TikTok, this may include basic user
           profile data, profile details, account statistics, public video lists,
           video uploads, and direct publishing permissions. For Meta products,
@@ -67,9 +67,9 @@ export default function PrivacyPolicyPage() {
           and related business assets.
         </p>
         <p>
-          ProERP does not sell social platform data. ProERP does not use social
+          WiseSocial does not sell social platform data. WiseSocial does not use social
           platform data for surveillance, eligibility decisions, or unrelated
-          advertising profiles. ProERP does not share TikTok, Facebook,
+          advertising profiles. WiseSocial does not share TikTok, Facebook,
           Instagram, or WhatsApp user data with third parties unless required to
           provide the service you requested, comply with law, protect security,
           or act with your consent.
@@ -78,7 +78,7 @@ export default function PrivacyPolicyPage() {
 
       <LegalSection title="Feature and Permission Use">
         <p>
-          ProERP maps each requested permission or credential to a specific app
+          WiseSocial maps each requested permission or credential to a specific app
           feature. We do not request these permissions for unrelated purposes.
         </p>
         <LegalList
@@ -97,21 +97,21 @@ export default function PrivacyPolicyPage() {
 
       <LegalSection title="Cookies and Similar Technologies">
         <p>
-          ProERP may use cookies, local storage, and similar technologies to keep
+          WiseSocial may use cookies, local storage, and similar technologies to keep
           you signed in, remember settings, protect sessions, measure service
           performance, diagnose errors, and improve the product. You can control
           cookies through your browser settings, but disabling some cookies may
-          prevent ProERP from working correctly.
+          prevent WiseSocial from working correctly.
         </p>
       </LegalSection>
 
       <LegalSection title="How We Share Information">
         <LegalList
           items={[
-            'With social platforms when you ask ProERP to connect an account, upload content, publish content, retrieve analytics, sync comments or messages, or otherwise use an integration.',
-            'With service providers that help us host, secure, monitor, support, process payments for, or operate ProERP, under contractual obligations appropriate to their role.',
-            'With workspace members according to the workspace permissions and features configured in ProERP.',
-            'With authorities, platforms, or other parties when required by law, legal process, security obligations, platform rules, or to protect the rights, safety, and integrity of ProERP, WiseAdmit, users, or the public.',
+            'With social platforms when you ask WiseSocial to connect an account, upload content, publish content, retrieve analytics, sync comments or messages, or otherwise use an integration.',
+            'With service providers that help us host, secure, monitor, support, process payments for, or operate WiseSocial, under contractual obligations appropriate to their role.',
+            'With workspace members according to the workspace permissions and features configured in WiseSocial.',
+            'With authorities, platforms, or other parties when required by law, legal process, security obligations, platform rules, or to protect the rights, safety, and integrity of WiseSocial, WiseAdmit, users, or the public.',
             'In connection with a business transaction such as a merger, financing, acquisition, or sale of assets, subject to appropriate confidentiality and continuity protections.',
           ]}
         />
@@ -119,7 +119,7 @@ export default function PrivacyPolicyPage() {
 
       <LegalSection title="Retention">
         <p>
-          We retain information for as long as needed to provide ProERP, comply
+          We retain information for as long as needed to provide WiseSocial, comply
           with law, resolve disputes, enforce agreements, maintain security, and
           support legitimate business operations. Social access tokens and
           integration records are retained while the integration remains
@@ -133,11 +133,11 @@ export default function PrivacyPolicyPage() {
       <LegalSection title="Your Controls and Choices">
         <LegalList
           items={[
-            'Disconnect integrations in ProERP to stop future access for a connected social account.',
-            'Revoke ProERP access directly in your TikTok, Facebook, Instagram, WhatsApp, or other platform account settings.',
-            'Delete drafts, media, schedules, and workspace records available in the ProERP interface.',
-            'Request access, correction, export, or deletion of ProERP account or workspace data by contacting WiseAdmit.',
-            'Request deletion of social platform data received by ProERP through the Data Deletion Instructions page.',
+            'Disconnect integrations in WiseSocial to stop future access for a connected social account.',
+            'Revoke WiseSocial access directly in your TikTok, Facebook, Instagram, WhatsApp, or other platform account settings.',
+            'Delete drafts, media, schedules, and workspace records available in the WiseSocial interface.',
+            'Request access, correction, export, or deletion of WiseSocial account or workspace data by contacting WiseAdmit.',
+            'Request deletion of social platform data received by WiseSocial through the Data Deletion Instructions page.',
           ]}
         />
         <p>
@@ -152,7 +152,7 @@ export default function PrivacyPolicyPage() {
       <LegalSection title="Security">
         <p>
           We use administrative, technical, and organizational safeguards
-          designed to protect ProERP data, including access controls, secured
+          designed to protect WiseSocial data, including access controls, secured
           authentication, logging, and restricted handling of platform tokens.
           No internet service can guarantee perfect security. You are
           responsible for maintaining secure credentials and limiting workspace
@@ -162,9 +162,9 @@ export default function PrivacyPolicyPage() {
 
       <LegalSection title="International Use">
         <p>
-          ProERP may process information in countries where WiseAdmit, hosting
+          WiseSocial may process information in countries where WiseAdmit, hosting
           providers, support providers, or integration providers operate. By
-          using ProERP, you understand that information may be transferred and
+          using WiseSocial, you understand that information may be transferred and
           processed outside your country, subject to applicable law and
           safeguards.
         </p>
@@ -172,15 +172,15 @@ export default function PrivacyPolicyPage() {
 
       <LegalSection title="Children">
         <p>
-          ProERP is intended for business and professional use and is not
-          directed to children. Users must be old enough to use ProERP and any
+          WiseSocial is intended for business and professional use and is not
+          directed to children. Users must be old enough to use WiseSocial and any
           connected social platform under applicable law and platform terms.
         </p>
       </LegalSection>
 
       <LegalSection title="Third-Party Platforms">
         <p>
-          ProERP is not affiliated with, endorsed by, or sponsored by TikTok,
+          WiseSocial is not affiliated with, endorsed by, or sponsored by TikTok,
           Meta, Facebook, Instagram, WhatsApp, or other third-party social
           platforms. Those platforms process information under their own terms,
           privacy policies, and developer rules. You should review those
@@ -191,8 +191,8 @@ export default function PrivacyPolicyPage() {
       <LegalSection title="Changes to This Policy">
         <p>
           We may update this Privacy Policy from time to time. If changes are
-          material, we will take reasonable steps to notify users through ProERP,
-          email, or another appropriate method. Continued use of ProERP after an
+          material, we will take reasonable steps to notify users through WiseSocial,
+          email, or another appropriate method. Continued use of WiseSocial after an
           update means the revised policy applies going forward.
         </p>
       </LegalSection>
@@ -200,7 +200,7 @@ export default function PrivacyPolicyPage() {
       <LegalSection title="Contact WiseAdmit">
         <p>
           For privacy questions, data requests, security concerns, or app review
-          questions about ProERP, contact WiseAdmit at support@wiseadmit.io.
+          questions about WiseSocial, contact WiseAdmit at ayush@wiseadmit.io or info@wiseadmit.io.
         </p>
       </LegalSection>
     </LegalShell>

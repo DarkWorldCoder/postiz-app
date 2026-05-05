@@ -11,13 +11,13 @@ import { useToaster } from '@gitroom/react/toaster/toaster';
 type Feature = 'comments' | 'ads' | 'leads' | 'commerce' | 'audiences' | 'suggestions' | 'subscriptions';
 
 const titleMap: Record<Feature, string> = {
-  comments: 'ProERP Comments',
-  ads: 'ProERP Ads',
-  leads: 'ProERP Leads',
-  commerce: 'ProERP Commerce',
-  audiences: 'ProERP Audiences',
-  suggestions: 'ProERP Ideas',
-  subscriptions: 'ProERP Subscriptions',
+  comments: 'WiseSocial Comments',
+  ads: 'WiseSocial Ads',
+  leads: 'WiseSocial Leads',
+  commerce: 'WiseSocial Commerce',
+  audiences: 'WiseSocial Audiences',
+  suggestions: 'WiseSocial Ideas',
+  subscriptions: 'WiseSocial Subscriptions',
 };
 
 const providerAllowList = [
@@ -113,7 +113,7 @@ export const MetaFeatureConsole: FC<{ feature: Feature }> = ({ feature }) => {
     <div className="bg-newBgColorInner flex-1 p-[20px] overflow-y-auto">
       <div className="mb-[18px] flex flex-wrap items-start justify-between gap-[16px] border-b border-blockSeparator pb-[18px]">
         <div>
-          <div className="text-[12px] font-[600] uppercase text-textItemBlur">ProERP workspace</div>
+          <div className="text-[12px] font-[600] uppercase text-textItemBlur">WiseSocial workspace</div>
           <h1 className="mt-[4px] text-[24px] font-[600]">{titleMap[feature]}</h1>
         </div>
         <div className="w-[280px]">
@@ -135,7 +135,7 @@ export const MetaFeatureConsole: FC<{ feature: Feature }> = ({ feature }) => {
       </div>
 
       {!selectedId ? (
-        <EmptyPanel title="No connected channel" text="Connect Facebook, Instagram, WhatsApp, or TikTok Business to load ProERP data here." />
+        <EmptyPanel title="No connected channel" text="Connect Facebook, Instagram, WhatsApp, or TikTok Business to load WiseSocial data here." />
       ) : feature === 'comments' ? (
         <CommentsPanel
           data={data}
@@ -279,7 +279,7 @@ const CommentsPanel = ({ data, loading, busy, form, setForm, run, integrationId 
       </Button>
     </Toolbar>
     {loading ? <LoadingComponent /> : !(data?.comments || []).length ? (
-      <EmptyPanel title="No comments loaded" text="Sync a post to bring comments into ProERP moderation." />
+      <EmptyPanel title="No comments loaded" text="Sync a post to bring comments into WiseSocial moderation." />
     ) : (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-[12px]">
         {(data?.comments || []).map((comment: any) => (
@@ -328,7 +328,7 @@ const AdsPanel = ({ data, loading, busy, form, setForm, run, integrationId }: an
       </Button>
     </Section>
     {loading ? <LoadingComponent /> : !(data || []).length ? (
-      <EmptyPanel title="No campaigns loaded" text="Sync campaigns or create a paused draft campaign to start managing ProERP ads." />
+      <EmptyPanel title="No campaigns loaded" text="Sync campaigns or create a paused draft campaign to start managing WiseSocial ads." />
     ) : (
       <div className="flex flex-col gap-[10px]">
         {(data || []).map((campaign: any) => (
@@ -349,7 +349,7 @@ const LeadsPanel = ({ data, loading, busy, run, integrationId }: any) => (
       <Button onClick={() => window.open('/api/leads/export.csv', '_blank')}>Export CSV</Button>
     </Section>
     {loading ? <LoadingComponent /> : !(data || []).length ? (
-      <EmptyPanel title="No leads yet" text="Sync forms and wait for Meta lead webhook data to load into ProERP." />
+      <EmptyPanel title="No leads yet" text="Sync forms and wait for Meta lead webhook data to load into WiseSocial." />
     ) : (
       <div className="flex flex-col gap-[10px]">
         {(data || []).map((lead: any) => (
@@ -404,7 +404,7 @@ const AudiencesPanel = ({ data, loading, busy, form, setForm, run, integrationId
       </Button>
     </Toolbar>
     {loading ? <LoadingComponent /> : !(data || []).length ? (
-      <EmptyPanel title="No audiences loaded" text="Create a ProERP audience or sync connected business audience data." />
+      <EmptyPanel title="No audiences loaded" text="Create a WiseSocial audience or sync connected business audience data." />
     ) : (
       <div className="flex flex-col gap-[10px]">
         {(data || []).map((audience: any) => (

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { MetaFeatureConsole } from '@gitroom/frontend/components/meta/meta-feature-console';
 
 export const metadata: Metadata = {
-  title: 'ProERP Subscriptions',
+  title: 'WiseSocial Subscriptions',
   description: 'Manage platform event subscriptions',
 };
 

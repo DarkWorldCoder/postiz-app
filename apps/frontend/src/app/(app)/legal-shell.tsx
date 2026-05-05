@@ -17,7 +17,7 @@ export const legalLinks = [
 
 export function LegalShell({
   title,
-  eyebrow = 'ProERP by WiseAdmit',
+  eyebrow = 'WiseSocial by WiseAdmit',
   description,
   children,
 }: LegalShellProps) {
@@ -26,7 +26,7 @@ export function LegalShell({
       <header className="border-b border-[#d9dee8] bg-white">
         <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-[18px] px-[20px] py-[24px] md:flex-row md:items-center md:justify-between">
           <Link href="/" className="text-[22px] font-[700] text-[#0f172a]">
-            ProERP
+            WiseSocial
           </Link>
           <nav className="flex flex-wrap gap-[10px] text-[14px] font-[600] text-[#475569]">
             {legalLinks.map((link) => (

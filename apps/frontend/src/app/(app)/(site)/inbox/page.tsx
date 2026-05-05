@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import { SocialInboxComponent } from '@gitroom/frontend/components/inbox/social-inbox.component';
 
 export const metadata: Metadata = {
-  title: 'ProERP Inbox',
+  title: 'WiseSocial Inbox',
   description: '',
 };
 

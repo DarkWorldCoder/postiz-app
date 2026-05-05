@@ -300,7 +300,7 @@ export const SocialInboxComponent = () => {
               <div className="min-w-0">
                 <div className="font-[500] truncate">{integration.name}</div>
                 <div className="text-[12px] text-textItemBlur truncate">
-                  ProERP {channelLabel(channel)} Inbox
+                  WiseSocial {channelLabel(channel)} Inbox
                 </div>
               </div>
             </button>
@@ -319,7 +319,7 @@ export const SocialInboxComponent = () => {
             {t('conversations', 'Conversations')}
           </div>
           <div className="text-[12px] text-textItemBlur">
-            ProERP
+            WiseSocial
           </div>
         </div>
         {conversationsLoading ? (

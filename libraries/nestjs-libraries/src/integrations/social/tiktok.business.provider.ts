@@ -90,13 +90,13 @@ export class TikTokBusinessProvider
       },
       {
         key: 'messagingBaseUrl',
-        label: 'ProERP Messaging Base URL',
+        label: 'WiseSocial Messaging Base URL',
         validation: `/^.*$/`,
         type: 'text' as const,
       },
       {
         key: 'messagingApiKey',
-        label: 'ProERP Messaging API Key',
+        label: 'WiseSocial Messaging API Key',
         validation: `/^.*$/`,
         type: 'password' as const,
       },
@@ -151,16 +151,20 @@ export class TikTokBusinessProvider
             value: body.businessId || '',
           },
           {
-            title: 'ProERP Messaging Base URL',
+            title: 'WiseSocial Messaging Base URL',
             description:
               'Optional bridge endpoint for TikTok Business Messaging conversations.',
             type: 'text' as const,
-            value: body.messagingBaseUrl || process.env.PROERP_TIKTOK_MESSAGING_BASE_URL || '',
+            value:
+              body.messagingBaseUrl ||
+              process.env.WISESOCIAL_TIKTOK_MESSAGING_BASE_URL ||
+              process.env.PROERP_TIKTOK_MESSAGING_BASE_URL ||
+              '',
           },
           {
-            title: 'ProERP Messaging API Key',
+            title: 'WiseSocial Messaging API Key',
             description:
-              'Optional bridge token. Environment variable PROERP_TIKTOK_MESSAGING_API_KEY takes precedence.',
+              'Optional bridge token. Environment variable WISESOCIAL_TIKTOK_MESSAGING_API_KEY takes precedence.',
             type: 'text' as const,
             value: body.messagingApiKey || '',
           },
@@ -253,10 +257,14 @@ export class TikTokBusinessProvider
   private messagingSettings(integration?: Integration): TikTokMessagingSettings {
     return {
       baseUrl:
+        process.env.WISESOCIAL_TIKTOK_MESSAGING_BASE_URL ||
         process.env.PROERP_TIKTOK_MESSAGING_BASE_URL ||
+        this.readSetting(integration, 'WiseSocial Messaging Base URL') ||
         this.readSetting(integration, 'ProERP Messaging Base URL'),
       apiKey:
+        process.env.WISESOCIAL_TIKTOK_MESSAGING_API_KEY ||
         process.env.PROERP_TIKTOK_MESSAGING_API_KEY ||
+        this.readSetting(integration, 'WiseSocial Messaging API Key') ||
         this.readSetting(integration, 'ProERP Messaging API Key'),
     };
   }
@@ -272,7 +280,7 @@ export class TikTokBusinessProvider
         this.identifier,
         '{}',
         JSON.stringify({ path }),
-        'TikTok Business Messaging needs PROERP_TIKTOK_MESSAGING_BASE_URL and PROERP_TIKTOK_MESSAGING_API_KEY, or the same values on the integration settings.'
+        'TikTok Business Messaging needs WISESOCIAL_TIKTOK_MESSAGING_BASE_URL and WISESOCIAL_TIKTOK_MESSAGING_API_KEY, or the same values on the integration settings.'
       );
     }
 
@@ -945,4 +953,3 @@ export class TikTokBusinessProvider
     );
   }
 }
-
