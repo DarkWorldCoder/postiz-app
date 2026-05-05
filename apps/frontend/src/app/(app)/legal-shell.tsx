@@ -25,7 +25,15 @@ export function LegalShell({
     <main className="min-h-dvh bg-[#f7f8fb] text-[#111827]">
       <header className="border-b border-[#d9dee8] bg-white">
         <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-[18px] px-[20px] py-[24px] md:flex-row md:items-center md:justify-between">
-          <Link href="/" className="text-[22px] font-[700] text-[#0f172a]">
+          <Link
+            href="/"
+            className="flex items-center gap-[10px] text-[22px] font-[700] text-[#0f172a]"
+          >
+            <img
+              src="/wisesocial.png"
+              alt="WiseSocial app icon"
+              className="h-[40px] w-[40px] rounded-[8px] object-cover"
+            />
             WiseSocial
           </Link>
           <nav className="flex flex-wrap gap-[10px] text-[14px] font-[600] text-[#475569]">
@@ -49,6 +57,11 @@ export function LegalShell({
       </header>
       <section className="border-b border-[#d9dee8] bg-white">
         <div className="mx-auto w-full max-w-[1120px] px-[20px] py-[54px]">
+          <img
+            src="/wisesocial.png"
+            alt="WiseSocial app icon"
+            className="mb-[22px] h-[72px] w-[72px] rounded-[14px] object-cover"
+          />
           <div className="text-[13px] font-[700] uppercase text-[#2563eb]">
             {eyebrow}
           </div>
